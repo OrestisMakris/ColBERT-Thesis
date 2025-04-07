@@ -20,6 +20,7 @@ from colbert.training.utils import print_progress, manage_checkpoints
 
 
 
+
 def train(config: ColBERTConfig, triples, queries=None, collection=None):
     config.checkpoint = config.checkpoint or 'bert-base-uncased'
 
@@ -124,6 +125,7 @@ def train(config: ColBERTConfig, triples, queries=None, collection=None):
                     loss += ib_loss
 
                 loss = loss / config.accumsteps
+                
 
             if config.rank < 1:
                 print_progress(scores)

@@ -11,6 +11,12 @@ import os
 import pathlib
 from torch.utils.cpp_extension import load
 
+# Initialize lists to accumulate embeddings
+all_query_embeddings = []
+all_document_embeddings = []
+counter = 0
+counter2 = 0
+
 
 class ColBERT(BaseColBERT):
     """
@@ -51,10 +57,23 @@ class ColBERT(BaseColBERT):
         cls.loaded_extensions = True
 
     def forward(self, Q, D):
+
+        global counter2
+        
         Q = self.query(*Q)
         D, D_mask = self.doc(*D, keep_dims='return_mask')
 
-        # Repeat each query encoding for every corresponding document.
+        counter2 += 1
+        print(f"Counter2: {counter2}")
+
+        print(f"Q shape: {Q.shape}")
+        print(f"D shape: {D.shape}")
+
+        # Append the current forward pass embeddings to the global lists
+        all_query_embeddings.append(Q.detach().cpu())
+        all_document_embeddings.append(D.detach().cpu())
+
+        # Continue with the forward pass
         Q_duplicated = Q.repeat_interleave(self.colbert_config.nway, dim=0).contiguous()
         scores = self.score(Q_duplicated, D, D_mask)
 
@@ -63,6 +82,8 @@ class ColBERT(BaseColBERT):
             return scores, ib_loss
 
         return scores
+
+    
 
     def compute_ib_loss(self, Q, D, D_mask):
         # TODO: Organize the code below! Quite messy.
@@ -163,7 +184,7 @@ def colbert_score(Q, D_padded, D_mask, config=ColBERTConfig()):
 
         EVENTUALLY: Consider masking with -inf for the maxsim (or enforcing a ReLU).
     """
-
+    global counter
     use_gpu = config.total_visible_gpus > 0
     if use_gpu:
         Q, D_padded, D_mask = Q.cuda(), D_padded.cuda(), D_mask.cuda()
@@ -171,11 +192,24 @@ def colbert_score(Q, D_padded, D_mask, config=ColBERTConfig()):
     assert Q.dim() == 3, Q.size()
     assert D_padded.dim() == 3, D_padded.size()
     assert Q.size(0) in [1, D_padded.size(0)]
+    
+    counter += 1
+
+    print(f"Counter: {counter}")
+
 
     scores = D_padded @ Q.to(dtype=D_padded.dtype).permute(0, 2, 1)
-
     return colbert_score_reduce(scores, D_mask, config)
 
+def save_all_embeddings():
+    all_query_embeddings_tensor = torch.cat(all_query_embeddings, dim=0)
+    all_document_embeddings_tensor = torch.cat(all_document_embeddings, dim=0)
+    torch.save(all_query_embeddings_tensor, 'all_query_embeddings.pt')
+    torch.save(all_document_embeddings_tensor, 'all_document_embeddings.pt')
+    print("All query embeddings saved to all_query_embeddings.pt")
+    print("All document embeddings saved to all_document_embeddings.pt")
+    print("Query embeddings tensor shape:", all_query_embeddings_tensor.shape)
+    print("Document embeddings tensor shape:", all_document_embeddings_tensor.shape)
 
 def colbert_score_packed(Q, D_packed, D_lengths, config=ColBERTConfig()):
     """
@@ -188,6 +222,7 @@ def colbert_score_packed(Q, D_packed, D_lengths, config=ColBERTConfig()):
         Q, D_packed, D_lengths = Q.cuda(), D_packed.cuda(), D_lengths.cuda()
 
     Q = Q.squeeze(0)
+
 
     assert Q.dim() == 2, Q.size()
     assert D_packed.dim() == 2, D_packed.size()

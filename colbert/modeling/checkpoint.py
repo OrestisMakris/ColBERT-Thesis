@@ -30,6 +30,11 @@ def pool_embeddings_hierarchical(
         protected_embeddings = passage_embeddings[:protected_tokens]
         passage_embeddings = passage_embeddings[protected_tokens:]
 
+        #shape int
+        print(f"passage_embeddings shape: {passage_embeddings.shape}")
+        print(f"protected_embeddings shape: {protected_embeddings.shape}")
+
+
         # Cosine similarity computation (vector are already normalized)
         similarities = torch.mm(passage_embeddings, passage_embeddings.t())
 
@@ -117,6 +122,14 @@ class Checkpoint(ColBERT):
         input_ids, attention_mask = self.query_tokenizer.tensorize(
             queries, context=context, full_length_search=full_length_search
         )
+
+
+        #shape
+        print(f"input_ids shape: {self.query.shape}")
+
+
+
+
         return self.query(input_ids, attention_mask)
 
     def docFromText(
@@ -192,6 +205,17 @@ class Checkpoint(ColBERT):
             return ([D[idx] for idx in reverse_indices.tolist()], *returned_text)
 
         input_ids, attention_mask = self.doc_tokenizer.tensorize(docs)
+
+
+
+        #shape
+
+        print(f"input_ids shape: {self.doc.shape}")
+
+
+
+
+
         return self.doc(input_ids, attention_mask, keep_dims=keep_dims, to_cpu=to_cpu)
 
     def lazy_rank(self, queries, docs):

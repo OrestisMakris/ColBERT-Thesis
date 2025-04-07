@@ -1,6 +1,7 @@
 from colbert.infra.run import Run
 from colbert.infra.launcher import Launcher
 from colbert.infra.config import ColBERTConfig, RunConfig
+from colbert.modeling.colbert import save_all_embeddings
 
 from colbert.training.training import train
 
@@ -29,8 +30,10 @@ class Trainer:
         launcher = Launcher(train)
 
         self._best_checkpoint_path = launcher.launch(self.config, self.triples, self.queries, self.collection)
+        save_all_embeddings()
 
 
     def best_checkpoint_path(self):
+        
         return self._best_checkpoint_path
 
