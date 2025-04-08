@@ -10,12 +10,14 @@ TextQueries = Union[str, 'list[str]', 'dict[int, str]', Queries]
 
 class HopSearcher(Searcher):
     def __init__(self, *args, config=None, interaction='flipr', **kw_args):
+        print("DEBUG: Creating HopSearcher instance", flush=True)
         defaults = ColBERTConfig(query_maxlen=64, interaction=interaction)
         config = ColBERTConfig.from_existing(defaults, config)
 
         super().__init__(*args, config=config, **kw_args)
 
     def encode(self, text: TextQueries, context: TextQueries):
+        print("DEBUG: Entered encode", flush=True)
         queries = text if type(text) is list else [text]
         context = context if context is None or type(context) is list else [context]
         bsize = 128 if len(queries) > 128 else None
@@ -26,9 +28,11 @@ class HopSearcher(Searcher):
         return Q
 
     def search(self, text: str, context: str, k=10):
+        print("DEBUG: Entered search hop", flush=True)
         return self.dense_search(self.encode(text, context), k)
 
     def search_all(self, queries: TextQueries, context: TextQueries, k=10):
+        print("DEBUG: Entered search_all hop", flush=True)
         queries = Queries.cast(queries)
         context = Queries.cast(context) if context is not None else context
 

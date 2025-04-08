@@ -30,7 +30,7 @@ class Trainer:
         launcher = Launcher(train)
 
         self._best_checkpoint_path = launcher.launch(self.config, self.triples, self.queries, self.collection)
-        save_all_embeddings()
+        
 
 
     def best_checkpoint_path(self):

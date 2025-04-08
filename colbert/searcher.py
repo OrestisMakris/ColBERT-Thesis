@@ -22,11 +22,11 @@ TextQueries = Union[str, 'list[str]', 'dict[int, str]', Queries]
 class Searcher:
     def __init__(self, index, checkpoint=None, collection=None, config=None, index_root=None, verbose:int = 3):
         self.verbose = verbose
+        print(f"DEBUG: __init__ called in Searcher ({__file__})", flush=True)
         if self.verbose > 1:
             print_memory_stats()
 
         initial_config = ColBERTConfig.from_existing(config, Run().config)
-
         default_index_root = initial_config.index_root_
         index_root = index_root if index_root else default_index_root
         self.index = os.path.join(index_root, index)
@@ -45,54 +45,53 @@ class Searcher:
             self.checkpoint = self.checkpoint.cuda()
         load_index_with_mmap = self.config.load_index_with_mmap
         if load_index_with_mmap and use_gpu:
-            raise ValueError(f"Memory-mapped index can only be used with CPU!")
+            raise ValueError("Memory-mapped index can only be used with CPU!")
         self.ranker = IndexScorer(self.index, use_gpu, load_index_with_mmap)
 
+        print("DEBUG: Completed __init__ in Searcher", flush=True)
         print_memory_stats()
 
     def configure(self, **kw_args):
+        print("DEBUG: Entered configure", flush=True)
         self.config.configure(**kw_args)
 
     def encode(self, text: TextQueries, full_length_search=False):
-        queries = text if type(text) is list else [text]
+        print("DEBUG: Entered encode", flush=True)
+        queries = text if isinstance(text, list) else [text]
         bsize = 128 if len(queries) > 128 else None
 
         self.checkpoint.query_tokenizer.query_maxlen = self.config.query_maxlen
         Q = self.checkpoint.queryFromText(queries, bsize=bsize, to_cpu=True, full_length_search=full_length_search)
-
+        print(f"DEBUG: Returning tensor Q of shape {Q.shape} from encode", flush=True)
         return Q
 
     def search(self, text: str, k=10, filter_fn=None, full_length_search=False, pids=None):
+        print("DEBUG: Entered search", flush=True)
         Q = self.encode(text, full_length_search=full_length_search)
         return self.dense_search(Q, k, filter_fn=filter_fn, pids=pids)
 
     def search_all(self, queries: TextQueries, k=10, filter_fn=None, full_length_search=False, qid_to_pids=None):
+        print("DEBUG: Entered search_all", flush=True)
         queries = Queries.cast(queries)
         queries_ = list(queries.values())
-
         Q = self.encode(queries_, full_length_search=full_length_search)
-
         return self._search_all_Q(queries, Q, k, filter_fn=filter_fn, qid_to_pids=qid_to_pids)
 
     def _search_all_Q(self, queries, Q, k, filter_fn=None, qid_to_pids=None):
+        print("DEBUG: Entered _search_all_Q", flush=True)
         qids = list(queries.keys())
-
         if qid_to_pids is None:
             qid_to_pids = {qid: None for qid in qids}
 
         all_scored_pids = [
-            list(
-                zip(
-                    *self.dense_search(
-                        Q[query_idx:query_idx+1],
-                        k, filter_fn=filter_fn,
-                        pids=qid_to_pids[qid]
-                    )
-                )
-            )
-            for query_idx, qid in tqdm(enumerate(qids))
+            list(zip(*self.dense_search(
+                Q[query_idx:query_idx+1],
+                k, filter_fn=filter_fn,
+                pids=qid_to_pids[qid]
+            )))
+            for query_idx, qid in enumerate(qids)
         ]
-
+        print("DEBUG: Completed dense_search calls in _search_all_Q", flush=True)
         data = {qid: val for qid, val in zip(queries.keys(), all_scored_pids)}
 
         provenance = Provenance()
@@ -104,6 +103,8 @@ class Searcher:
         return Ranking(data=data, provenance=provenance)
 
     def dense_search(self, Q: torch.Tensor, k=10, filter_fn=None, pids=None):
+        print("DEBUG: Entered dense_search", flush=True)
+        # Configuration branch based on k.
         if k <= 10:
             if self.config.ncells is None:
                 self.configure(ncells=1)
@@ -127,5 +128,5 @@ class Searcher:
                 self.configure(ndocs=max(k * 4, 4096))
 
         pids, scores = self.ranker.rank(self.config, Q, filter_fn=filter_fn, pids=pids)
-
+        print(f"DEBUG: dense_search returning {len(pids)} pids and {len(scores)} scores", flush=True)
         return pids[:k], list(range(1, k+1)), scores[:k]

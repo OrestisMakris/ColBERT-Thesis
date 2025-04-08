@@ -151,7 +151,7 @@ class ColBERT(BaseColBERT):
 
 # TODO: The masking below might also be applicable in the kNN part
 def colbert_score_reduce(scores_padded, D_mask, config: ColBERTConfig):
-    D_padding = ~D_mask.view(scores_padded.size(0), scores_padded.size(1)).bool()    git cherry -v
+    D_padding = ~D_mask.view(scores_padded.size(0), scores_padded.size(1)).bool()    
     scores_padded[D_padding] = -9999
     scores = scores_padded.max(1).values
 

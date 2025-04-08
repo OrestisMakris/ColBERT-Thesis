@@ -124,8 +124,7 @@ class Checkpoint(ColBERT):
         )
 
 
-        #shape
-        print(f"input_ids shape: {self.query.shape}")
+
 
 
 
@@ -210,7 +209,7 @@ class Checkpoint(ColBERT):
 
         #shape
 
-        print(f"input_ids shape: {self.doc.shape}")
+       
 
 
 

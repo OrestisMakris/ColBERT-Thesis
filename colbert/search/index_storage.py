@@ -17,6 +17,8 @@ import os
 import pathlib
 from torch.utils.cpp_extension import load
 
+counter = 0
+
 class IndexScorer(IndexLoader, CandidateGeneration):
     def __init__(self, index_path, use_gpu=True, load_index_with_mmap=False):
         super().__init__(
@@ -116,21 +118,30 @@ class IndexScorer(IndexLoader, CandidateGeneration):
             If Q.size(0) is 1, the matrix will be compared with all passages.
             Otherwise, each query matrix will be compared against the *aligned* passage.
         """
+        global counter
 
         # TODO: Remove batching?
         batch_size = 2 ** 20
 
+        print("DEBUG: Entered score_pids", flush=True)
+
+
         if centroid_scores is not None:
+            print("score_pids: Using centroid_scores branch")
             if self.use_gpu:
+                print("score_pids: GPU enabled in centroid_scores branch")
                 centroid_scores = centroid_scores.cuda()
 
             idx = centroid_scores.max(-1).values >= config.centroid_score_threshold
-
+            print(f"score_pids: Centroid threshold filter applied, idx shape: {idx.shape}")
+            
             if self.use_gpu:
+                print("score_pids: Processing approx_scores on GPU")
                 approx_scores = []
 
                 # Filter docs using pruned centroid scores
                 for i in range(0, ceil(len(pids) / batch_size)):
+                    print(f"score_pids: Processing batch {i}")
                     pids_ = pids[i * batch_size : (i+1) * batch_size]
                     codes_packed, codes_lengths = self.embeddings_strided.lookup_codes(pids_)
                     idx_ = idx[codes_packed.long()]
@@ -149,6 +160,7 @@ class IndexScorer(IndexLoader, CandidateGeneration):
                 approx_scores = torch.cat(approx_scores, dim=0)
                 assert approx_scores.is_cuda, approx_scores.device
                 if config.ndocs < len(approx_scores):
+                    print("score_pids: Applying topk for pruned docs")
                     pids = pids[torch.topk(approx_scores, k=config.ndocs).indices]
 
                 # Filter docs using full centroid scores
@@ -160,15 +172,20 @@ class IndexScorer(IndexLoader, CandidateGeneration):
                 if config.ndocs // 4 < len(approx_scores):
                     pids = pids[torch.topk(approx_scores, k=(config.ndocs // 4)).indices]
             else:
+                print("score_pids: CPU branch for centroid_scores")
                 pids = IndexScorer.filter_pids(
                         pids, centroid_scores, self.embeddings.codes, self.doclens,
                         self.offsets, idx, config.ndocs
                     )
-
+        else:
+            print("score_pids: centroid_scores is None")
+    
         # Rank final list of docs using full approximate embeddings (including residuals)
         if self.use_gpu:
+            print("score_pids: Using GPU for final ranking")
             D_packed, D_mask = self.lookup_pids(pids)
         else:
+            print("score_pids: Using CPU for final ranking")
             D_packed = IndexScorer.decompress_residuals(
                     pids,
                     self.doclens,
@@ -184,11 +201,15 @@ class IndexScorer(IndexLoader, CandidateGeneration):
                 )
             D_packed = torch.nn.functional.normalize(D_packed.to(torch.float32), p=2, dim=-1)
             D_mask = self.doclens[pids.long()]
-
+        counter += 1
+        print(f"Counter: {counter}")
+        print(f"score_pids: D_packed shape: {D_packed.shape}")
+        print(f"score_pids: Q shape: {Q.shape}")
         if Q.size(0) == 1:
+            print("score_pids: Using colbert_score_packed")
             return colbert_score_packed(Q, D_packed, D_mask, config), pids
 
         D_strided = StridedTensor(D_packed, D_mask, use_gpu=self.use_gpu)
         D_padded, D_lengths = D_strided.as_padded_tensor()
-
+        print("score_pids: Using colbert_score")
         return colbert_score(Q, D_padded, D_lengths, config), pids
