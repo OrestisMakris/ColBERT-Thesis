@@ -1,17 +1,3 @@
-import sys
-import os
-current_dir = os.path.dirname(os.path.abspath(__file__))
-# Move two levels up: from colbert_run -> ColBERT-Thesis -> workspace root
-project_root = os.path.join(current_dir, '..', '..', 'ColBERT')
-sys.path.insert(0, project_root)
-
-from colbert.infra import Run, RunConfig, ColBERTConfig
-from colbert import Indexer
-
-if __name__=='__main__':
-    with Run().context(RunConfig(nranks=1, experiment="CF1")):
-        config = ColBERTConfig(
-            nbits=1,
-        )
-        indexer = Indexer(checkpoint="./experiments/default/none/2025-03/20/17.12.43/checkpoints/colbert", config=config)
-        indexer.index(name="CF1", collection="../CF_DataSet/docs.tsv", overwrite=True)
+version https://git-lfs.github.com/spec/v1
+oid sha256:fbd76e7b6b4149ad8402548cb506880a29874b598c5eda8dc21ab18c0d409445
+size 695
