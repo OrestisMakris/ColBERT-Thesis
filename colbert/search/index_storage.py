@@ -113,35 +113,32 @@ class IndexScorer(IndexLoader, CandidateGeneration):
     def score_pids(self, config, Q, pids, centroid_scores):
         """
             Always supply a flat list or tensor for `pids`.
-
             Supply sizes Q = (1 | num_docs, *, dim) and D = (num_docs, *, dim).
             If Q.size(0) is 1, the matrix will be compared with all passages.
             Otherwise, each query matrix will be compared against the *aligned* passage.
         """
         global counter
-
+    
         # TODO: Remove batching?
         batch_size = 2 ** 20
-
+    
         print("DEBUG: Entered score_pids", flush=True)
-
-
+    
         if centroid_scores is not None:
-            print("score_pids: Using centroid_scores branch")
+            print("score_pids: Using centroid_scores branch", flush=True)
             if self.use_gpu:
-                print("score_pids: GPU enabled in centroid_scores branch")
+                print("score_pids: GPU enabled in centroid_scores branch", flush=True)
                 centroid_scores = centroid_scores.cuda()
-
+    
             idx = centroid_scores.max(-1).values >= config.centroid_score_threshold
-            print(f"score_pids: Centroid threshold filter applied, idx shape: {idx.shape}")
-            
+            print(f"score_pids: Centroid threshold filter applied, idx shape: {idx.shape}", flush=True)
+    
             if self.use_gpu:
-                print("score_pids: Processing approx_scores on GPU")
+                print("score_pids: Processing approx_scores on GPU", flush=True)
                 approx_scores = []
-
                 # Filter docs using pruned centroid scores
                 for i in range(0, ceil(len(pids) / batch_size)):
-                    print(f"score_pids: Processing batch {i}")
+                    print(f"score_pids: Processing batch {i}", flush=True)
                     pids_ = pids[i * batch_size : (i+1) * batch_size]
                     codes_packed, codes_lengths = self.embeddings_strided.lookup_codes(pids_)
                     idx_ = idx[codes_packed.long()]
@@ -160,9 +157,9 @@ class IndexScorer(IndexLoader, CandidateGeneration):
                 approx_scores = torch.cat(approx_scores, dim=0)
                 assert approx_scores.is_cuda, approx_scores.device
                 if config.ndocs < len(approx_scores):
-                    print("score_pids: Applying topk for pruned docs")
+                    print("score_pids: Applying topk for pruned docs", flush=True)
                     pids = pids[torch.topk(approx_scores, k=config.ndocs).indices]
-
+    
                 # Filter docs using full centroid scores
                 codes_packed, codes_lengths = self.embeddings_strided.lookup_codes(pids)
                 approx_scores = centroid_scores[codes_packed.long()]
@@ -172,44 +169,75 @@ class IndexScorer(IndexLoader, CandidateGeneration):
                 if config.ndocs // 4 < len(approx_scores):
                     pids = pids[torch.topk(approx_scores, k=(config.ndocs // 4)).indices]
             else:
-                print("score_pids: CPU branch for centroid_scores")
+                print("score_pids: CPU branch for centroid_scores", flush=True)
                 pids = IndexScorer.filter_pids(
-                        pids, centroid_scores, self.embeddings.codes, self.doclens,
-                        self.offsets, idx, config.ndocs
-                    )
+                    pids, centroid_scores, self.embeddings.codes, self.doclens,
+                    self.offsets, idx, config.ndocs
+                )
         else:
-            print("score_pids: centroid_scores is None")
-    
+            print("score_pids: centroid_scores is None", flush=True)
+        
         # Rank final list of docs using full approximate embeddings (including residuals)
         if self.use_gpu:
-            print("score_pids: Using GPU for final ranking")
+            print("score_pids: Using GPU for final ranking", flush=True)
+            print(f"score_pids: pids shape: {pids.shape}", flush=True)
             D_packed, D_mask = self.lookup_pids(pids)
+            D_strided = StridedTensor(D_packed, D_mask, use_gpu=self.use_gpu)
         else:
-            print("score_pids: Using CPU for final ranking")
+            print("score_pids: Using CPU for final ranking", flush=True)
             D_packed = IndexScorer.decompress_residuals(
-                    pids,
-                    self.doclens,
-                    self.offsets,
-                    self.codec.bucket_weights,
-                    self.codec.reversed_bit_map,
-                    self.codec.decompression_lookup_table,
-                    self.embeddings.residuals,
-                    self.embeddings.codes,
-                    self.codec.centroids,
-                    self.codec.dim,
-                    self.codec.nbits
-                )
+                pids,
+                self.doclens,
+                self.offsets,
+                self.codec.bucket_weights,
+                self.codec.reversed_bit_map,
+                self.codec.decompression_lookup_table,
+                self.embeddings.residuals,
+                self.embeddings.codes,
+                self.codec.centroids,
+                self.codec.dim,
+                self.codec.nbits
+            )
             D_packed = torch.nn.functional.normalize(D_packed.to(torch.float32), p=2, dim=-1)
             D_mask = self.doclens[pids.long()]
+            D_strided = StridedTensor(D_packed, D_mask, use_gpu=self.use_gpu)
+        
+        # Convert the flat embeddings and mask into padded (non-packed) representation.
+        D_padded, D_lengths = D_strided.as_padded_tensor()  # D_padded: [num_docs, max_doc_tokens, emb_dim]
+        
+        # Export the Query and Document tensors for CNN training
+        torch.save(Q, "exported_query.pt")                   # Expected shape: [1, query_maxlen, emb_dim] e.g., [1, 32, 128]
+        torch.save(D_padded, "exported_doc_padded.pt")         # Expected shape: [num_docs, max_doc_tokens, emb_dim]
+        torch.save(D_lengths, "exported_doc_lengths.pt")       # Expected shape: [num_docs]
+        print("Exported Q, D_padded, and D_lengths for CNN training", flush=True)
+    
         counter += 1
-        print(f"Counter: {counter}")
-        print(f"score_pids: D_packed shape: {D_packed.shape}")
-        print(f"score_pids: Q shape: {Q.shape}")
+        print(f"Counter: {counter}", flush=True)
+        print(f"score_pids: D_packed shape: {D_packed.shape}", flush=True)
+        print(f"score_pids: Q shape: {Q.shape}", flush=True)
+        print(f"score_pids: D_mask shape: {D_mask.shape}", flush=True)
+        print(f"score_pids: D_padded shape: {D_padded.shape}", flush=True)
+        
         if Q.size(0) == 1:
-            print("score_pids: Using colbert_score_packed")
+            print("score_pids: Using colbert_score_packed", flush=True)
             return colbert_score_packed(Q, D_packed, D_mask, config), pids
-
+    
+        # Otherwise, re-create padded representation (if needed) and use colbert_score.
         D_strided = StridedTensor(D_packed, D_mask, use_gpu=self.use_gpu)
         D_padded, D_lengths = D_strided.as_padded_tensor()
-        print("score_pids: Using colbert_score")
+        print("score_pids: Using colbert_score", flush=True)
         return colbert_score(Q, D_padded, D_lengths, config), pids
+    
+
+    def export_all_documents(self, Q):
+            print("Exporting all documents for CNN training", flush=True)
+            # Retrieve all document ids (pids) before filtering
+            all_pids = torch.arange(0, len(self.doclens), device=Q.device)
+            D_packed, D_mask = self.lookup_pids(all_pids)
+            D_strided = StridedTensor(D_packed, D_mask, use_gpu=self.use_gpu)
+            D_padded, D_lengths = D_strided.as_padded_tensor()
+            #dimensions = D_padded.shape
+            print(f"Exporting all documents with dimensions: {D_padded.shape}", flush=True)
+            torch.save(D_padded, "exported_all_doc_padded.pt")
+            torch.save(D_lengths, "exported_all_doc_lengths.pt")
+            print("Exported all document embeddings for CNN training")
