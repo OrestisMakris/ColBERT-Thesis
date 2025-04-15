@@ -4,35 +4,58 @@ import torch.nn as nn
 class CNNSimilarity(nn.Module):
     def __init__(self, embedding_dim):
         super(CNNSimilarity, self).__init__()
-        # Two 1D convolution layers to process the embeddings
-        self.conv1 = nn.Conv1d(in_channels=embedding_dim, out_channels=128, kernel_size=3, padding=1)
-        self.conv2 = nn.Conv1d(in_channels=128, out_channels=64, kernel_size=3, padding=1)
-        # Fully connected layers to produce a final similarity score
-        self.fc1 = nn.Linear(64 * 2, 32)  # concatenation of query and document features
-        self.fc2 = nn.Linear(32, 1)
+        # Increased convolutional capacity.
+        self.conv1 = nn.Conv1d(in_channels=embedding_dim, out_channels=512, kernel_size=3, padding=1)
+        self.bn1 = nn.BatchNorm1d(512)
+        self.conv2 = nn.Conv1d(in_channels=512, out_channels=256, kernel_size=3, padding=1)
+        self.bn2 = nn.BatchNorm1d(256)
+        self.conv3 = nn.Conv1d(in_channels=256, out_channels=256, kernel_size=3, padding=1)
+        self.bn3 = nn.BatchNorm1d(256)
+        self.conv4 = nn.Conv1d(in_channels=256, out_channels=128, kernel_size=3, padding=1)
+        self.bn4 = nn.BatchNorm1d(128)
+        
+        # Fully connected layers for the final similarity score.
+        # After global pooling, query and document features are both [batch, 128].
+        # Their concatenation yields a feature vector of size 256.
+        self.fc1 = nn.Linear(128 * 2, 128)
+        self.dropout1 = nn.Dropout(0.5)
+        self.fc2 = nn.Linear(128, 64)
+        self.dropout2 = nn.Dropout(0.5)
+        self.fc3 = nn.Linear(64, 32)
+        self.fc4 = nn.Linear(32, 1)
 
     def forward(self, query, document):
         """
-        Both query and document are expected to have shape [batch, seq_len, embed_dim]
+        Both query and document are expected to have shape [batch, seq_len, embed_dim].
         """
-        # Permute to [batch, embed_dim, seq_len] for Conv1d (which expects channels first)
+        # Permute to [batch, embed_dim, seq_len] for Conv1d.
         query = query.permute(0, 2, 1)
         document = document.permute(0, 2, 1)
 
-
-        query = torch.relu(self.conv1(query))
-        query = torch.relu(self.conv2(query))
-
+        # Process query.
+        query = torch.relu(self.bn1(self.conv1(query)))
+        query = torch.relu(self.bn2(self.conv2(query)))
+        query = torch.relu(self.bn3(self.conv3(query)))
+        query = torch.relu(self.bn4(self.conv4(query)))
+        # Global max pooling over the sequence dimension.
         query = torch.max(query, dim=2)[0]
 
-        document = torch.relu(self.conv1(document))
-        document = torch.relu(self.conv2(document))
+        # Process document.
+        document = torch.relu(self.bn1(self.conv1(document)))
+        document = torch.relu(self.bn2(self.conv2(document)))
+        document = torch.relu(self.bn3(self.conv3(document)))
+        document = torch.relu(self.bn4(self.conv4(document)))
         document = torch.max(document, dim=2)[0]
 
+        # Concatenate features.
         combined = torch.cat([query, document], dim=1)
 
+        # Fully connected layers.
         out = torch.relu(self.fc1(combined))
-        # Using sigmoid to bound the similarity score between 0 and 1
-        out = torch.sigmoid(self.fc2(out))
-
+        out = self.dropout1(out)
+        out = torch.relu(self.fc2(out))
+        out = self.dropout2(out)
+        out = torch.relu(self.fc3(out))
+        # Using sigmoid to bound the similarity score between 0 and 1.
+        out = torch.sigmoid(self.fc4(out))
         return out
