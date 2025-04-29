@@ -60,46 +60,157 @@
 #         out = torch.sigmoid(self.fc4(out))
 #         return out
 
+# import torch
+# import torch.nn as nn
+# import torch.nn.functional as F
+
+# class CNNSimilarityTriplet(nn.Module):
+#     def __init__(self, embedding_dim):
+#         super(CNNSimilarityTriplet, self).__init__()
+#         # Convolutional encoder.
+#         self.conv1 = nn.Conv1d(in_channels=embedding_dim, out_channels=512, kernel_size=3, padding=1)
+#         # Correct the number of features for bn1 to match conv1's output channels
+#         self.bn1 = nn.BatchNorm1d(512) 
+#         self.conv2 = nn.Conv1d(in_channels=512, out_channels=256, kernel_size=3, padding=1)
+#         self.bn2 = nn.BatchNorm1d(256)
+#         self.conv3 = nn.Conv1d(in_channels=256, out_channels=256, kernel_size=3, padding=1)
+#         self.bn3 = nn.BatchNorm1d(256)
+#         self.conv4 = nn.Conv1d(in_channels=256, out_channels=128, kernel_size=3, padding=1)
+#         self.bn4 = nn.BatchNorm1d(128)
+        
+#         # Fully connected head that produces the final embedding.
+#         # Global max pooling produces a [batch, 128] vector.
+#         self.fc = nn.Sequential(
+#             nn.Linear(128, 64),
+#             nn.ReLU(),
+#             nn.Dropout(0.5),
+#             nn.Linear(64, 32)
+#         )
+        
+#     def encode(self, x):
+#         # x: [batch, seq_len, embed_dim]
+#         # Permute for Conv1d: [batch, embed_dim, seq_len]
+#         x = x.permute(0, 2, 1)
+#         x = F.relu(self.bn1(self.conv1(x)))
+#         x = F.relu(self.bn2(self.conv2(x)))
+#         x = F.relu(self.bn3(self.conv3(x)))
+#         x = F.relu(self.bn4(self.conv4(x)))
+#         # Global max pooling over the sequence dimension.
+#         x = torch.max(x, dim=2)[0]  # Shape: [batch, 128]
+#         x = self.fc(x)             # Shape: [batch, 32]
+#         # L2 normalize the embedding.
+#         x = F.normalize(x, p=2, dim=1)
+#         return x
+    
+#     def forward(self, x):
+#         return self.encode(x)
+
+# import torch
+# import torch.nn as nn
+# import torch.nn.functional as F
+
+# # --- CNN Token Encoder Class ---
+# class CNNTokenEncoder(nn.Module):
+#     def __init__(self, embedding_dim, output_dim=128):
+#         """
+#         Args:
+#             embedding_dim: Dimension of the input token embeddings (e.g., 128 from ColBERT).
+#             output_dim: Dimension of the output token embeddings after CNN processing.
+#         """
+#         super(CNNTokenEncoder, self).__init__()
+#         # Using a simpler 4-layer CNN for demonstration. Adjust as needed.
+#         # Layer dimensions: input_dim -> 256 -> 256 -> 128 -> output_dim
+#         self.conv1 = nn.Conv1d(in_channels=embedding_dim, out_channels=256, kernel_size=3, padding=1)
+#         self.bn1 = nn.BatchNorm1d(256)
+#         self.conv2 = nn.Conv1d(in_channels=256, out_channels=256, kernel_size=3, padding=1)
+#         self.bn2 = nn.BatchNorm1d(256)
+#         self.conv3 = nn.Conv1d(in_channels=256, out_channels=128, kernel_size=3, padding=1)
+#         self.bn3 = nn.BatchNorm1d(128)
+#         self.conv4 = nn.Conv1d(in_channels=128, out_channels=output_dim, kernel_size=3, padding=1)
+#         # No BatchNorm after the last conv layer, similar to some practices. Add if needed.
+
+#     def forward(self, x):
+#         """
+#         Input x: [batch, seq_len, embed_dim]
+#         Output: [batch, seq_len, output_dim] (L2 Normalized)
+#         """
+#         # Permute for Conv1d: [batch, embed_dim, seq_len]
+#         x = x.permute(0, 2, 1)
+
+#         x = F.relu(self.bn1(self.conv1(x)))
+#         x = F.relu(self.bn2(self.conv2(x)))
+#         x = F.relu(self.bn3(self.conv3(x)))
+#         x = self.conv4(x) # No activation after the last layer, or add ReLU if preferred
+
+#         # Permute back to [batch, seq_len, output_dim]
+#         x = x.permute(0, 2, 1)
+#         # L2 normalize along the feature dimension (last dimension)
+#         x = F.normalize(x, p=2, dim=-1)
+#         return x
+
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
 
-class CNNSimilarityTriplet(nn.Module):
+# --- Use this CNNSimilarity model ---
+class CNNSimilarity(nn.Module):
     def __init__(self, embedding_dim):
-        super(CNNSimilarityTriplet, self).__init__()
-        # Convolutional encoder.
-        self.conv1 = nn.Conv1d(in_channels=embedding_dim, out_channels=512, kernel_size=3, padding=1)
-        self.bn1 = nn.BatchNorm1d(1024)
-        self.conv2 = nn.Conv1d(in_channels=512, out_channels=256, kernel_size=3, padding=1)
-        self.bn2 = nn.BatchNorm1d(256)
-        self.conv3 = nn.Conv1d(in_channels=256, out_channels=256, kernel_size=3, padding=1)
-        self.bn3 = nn.BatchNorm1d(256)
-        self.conv4 = nn.Conv1d(in_channels=256, out_channels=128, kernel_size=3, padding=1)
-        self.bn4 = nn.BatchNorm1d(128)
-        
-        # Fully connected head that produces the final embedding.
-        # Global max pooling produces a [batch, 128] vector.
-        self.fc = nn.Sequential(
-            nn.Linear(128, 64),
-            nn.ReLU(),
-            nn.Dropout(0.5),
-            nn.Linear(64, 32)
-        )
-        
-    def encode(self, x):
+        super(CNNSimilarity, self).__init__()
+        # Shared convolutional layers. Using a slightly simpler setup than before.
+        # Adjust channels/layers as needed.
+        self.conv1 = nn.Conv1d(in_channels=embedding_dim, out_channels=256, kernel_size=3, padding=1)
+        self.bn1 = nn.BatchNorm1d(256)
+        self.conv2 = nn.Conv1d(in_channels=256, out_channels=128, kernel_size=3, padding=1)
+        self.bn2 = nn.BatchNorm1d(128)
+        self.conv3 = nn.Conv1d(in_channels=128, out_channels=128, kernel_size=3, padding=1)
+        self.bn3 = nn.BatchNorm1d(128)
+
+        # Fully connected layers for the final similarity score.
+        # After global pooling, query and document features are both [batch, 128].
+        # Their concatenation yields a feature vector of size 256.
+        self.fc1 = nn.Linear(128 * 2, 128) # Input is concatenation of pooled Q and D
+        self.dropout1 = nn.Dropout(0.5)
+        self.fc2 = nn.Linear(128, 64)
+        self.dropout2 = nn.Dropout(0.5)
+        self.fc3 = nn.Linear(64, 1) # Output a single score
+
+    def process_sequence(self, x):
+        """ Shared CNN processing for a sequence """
         # x: [batch, seq_len, embed_dim]
-        # Permute for Conv1d: [batch, embed_dim, seq_len]
+        # Permute to [batch, embed_dim, seq_len] for Conv1d.
         x = x.permute(0, 2, 1)
         x = F.relu(self.bn1(self.conv1(x)))
         x = F.relu(self.bn2(self.conv2(x)))
         x = F.relu(self.bn3(self.conv3(x)))
-        x = F.relu(self.bn4(self.conv4(x)))
         # Global max pooling over the sequence dimension.
-        x = torch.max(x, dim=2)[0]  # Shape: [batch, 128]
-        x = self.fc(x)             # Shape: [batch, 32]
-        # L2 normalize the embedding.
-        x = F.normalize(x, p=2, dim=1)
+        x = torch.max(x, dim=2)[0] # Shape: [batch, 128]
         return x
-    
-    def forward(self, x):
-        return self.encode(x)
+
+    def forward(self, query, document):
+        """
+        Args:
+            query: Query sequence embeddings [batch, q_len, embed_dim]
+            document: Document sequence embeddings [batch, d_len, embed_dim]
+        Returns:
+            score: Similarity score [batch, 1]
+        """
+        # Process query and document through shared CNN layers + pooling
+        query_pooled = self.process_sequence(query)     # [batch, 128]
+        document_pooled = self.process_sequence(document) # [batch, 128]
+
+        # Concatenate features.
+        combined = torch.cat([query_pooled, document_pooled], dim=1) # [batch, 256]
+
+        # Fully connected layers for scoring.
+        out = F.relu(self.fc1(combined))
+        out = self.dropout1(out)
+        out = F.relu(self.fc2(out))
+        out = self.dropout2(out)
+        out = self.fc3(out) # Output raw score (logit) [batch, 1]
+        # Optional: Apply sigmoid if you want score between 0 and 1
+        # out = torch.sigmoid(out)
+        return out
+
+# --- You can keep or remove the other classes (CNNSimilarityTriplet, CNNTokenEncoder) ---
+# class CNNSimilarityTriplet(nn.Module): ...
+# class CNNTokenEncoder(nn.Module): ...
