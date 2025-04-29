@@ -355,13 +355,13 @@ def main_inference(model_path, query_emb_path, doc_emb_path, output_ranking_path
 if __name__ == "__main__":
     # --- Configuration ---
     # Use the best model saved during training
-    MODEL_PATH = "cnn_pairwise_scorer_best.pt"
+    MODEL_PATH = "cnn_pairwise_scorer_leaky_margin_best.pt"
     QUERY_EMB_PATH = "../colbert_run/exported_all_query.pt"
     DOC_EMB_PATH = "../colbert_run/exported_all_doc_padded.pt"
     # Define the output path for the ranking file
     OUTPUT_RANKING_PATH = "rankings/cnn_pairwise.ranking.tsv"
     # Batch size for inference (adjust based on GPU memory)
-    INFERENCE_BATCH_SIZE = 256 # Can often be larger here
+    INFERENCE_BATCH_SIZE = 16 # Can often be larger here
 
     # --- Run Inference ---
     main_inference(MODEL_PATH, QUERY_EMB_PATH, DOC_EMB_PATH, OUTPUT_RANKING_PATH,
