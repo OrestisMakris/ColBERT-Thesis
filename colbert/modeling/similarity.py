@@ -69,7 +69,7 @@ class CNNSimilarityTriplet(nn.Module):
         super(CNNSimilarityTriplet, self).__init__()
         # Convolutional encoder.
         self.conv1 = nn.Conv1d(in_channels=embedding_dim, out_channels=512, kernel_size=3, padding=1)
-        self.bn1 = nn.BatchNorm1d(512)
+        self.bn1 = nn.BatchNorm1d(1024)
         self.conv2 = nn.Conv1d(in_channels=512, out_channels=256, kernel_size=3, padding=1)
         self.bn2 = nn.BatchNorm1d(256)
         self.conv3 = nn.Conv1d(in_channels=256, out_channels=256, kernel_size=3, padding=1)

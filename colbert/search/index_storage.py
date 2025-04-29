@@ -230,6 +230,11 @@ class IndexScorer(IndexLoader, CandidateGeneration):
     
 
     def export_all_documents(self, Q):
+            """Export all documents for CNN training. Orestis"""
+            # Ensure the index is loaded
+            if not self.index_loaded:
+                raise RuntimeError("Index not loaded. Please load the index before exporting documents.")
+
             print("Exporting all documents for CNN training", flush=True)
             # Retrieve all document ids (pids) before filtering
             all_pids = torch.arange(0, len(self.doclens), device=Q.device)
