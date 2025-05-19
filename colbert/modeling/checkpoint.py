@@ -124,11 +124,6 @@ class Checkpoint(ColBERT):
         )
 
 
-
-
-
-
-
         return self.query(input_ids, attention_mask)
 
     def docFromText(

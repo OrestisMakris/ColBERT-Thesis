@@ -361,7 +361,7 @@ from torch.optim.lr_scheduler import ReduceLROnPlateau
 from torch.utils.data import DataLoader, Subset, random_split
 from cnn_triplet_dataset import CNNTripletDataset # Re-use dataset
 # Make sure you are importing the correct CNNSimilarity class
-from modeling.similarity import CNNSimilarity
+from old_approach.similarity_old import CNNSimilarity
 from tqdm import tqdm
 import os
 
