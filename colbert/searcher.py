@@ -130,3 +130,5 @@ class Searcher:
         pids, scores = self.ranker.rank(self.config, Q, filter_fn=filter_fn, pids=pids)
         print(f"DEBUG: dense_search returning {len(pids)} pids and {len(scores)} scores", flush=True)
         return pids[:k], list(range(1, k+1)), scores[:k]
+    
+    
