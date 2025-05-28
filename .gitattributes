@@ -1,1 +1,2 @@
 colbert_run/** filter=lfs diff=lfs merge=lfs -text
+padded_matrices_cnn/*.pt filter=lfs diff=lfs merge=lfs -text
