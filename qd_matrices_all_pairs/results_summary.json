@@ -1,0 +1,602 @@
+{
+  "0": {
+    "query_text_snippet": "WHAT ARE THE EFFECTS OF CALCIUM ON THE PHYSICAL PROPERTIES OF MUCUS FROM CF PATIENTS",
+    "pids_processed_count": 1240,
+    "top_scoring_pid": 620,
+    "best_maxsim_score": 0.9716964364051819
+  },
+  "1": {
+    "query_text_snippet": "CAN ONE DISTINGUISH BETWEEN THE EFFECTS OF MUCUS HYPERSECRETION AND INFECTION ON THE SUBMUCOSAL GLAN...",
+    "pids_processed_count": 1240,
+    "top_scoring_pid": 592,
+    "best_maxsim_score": 0.9694973826408386
+  },
+  "2": {
+    "query_text_snippet": "HOW ARE SALIVARY GLYCOPROTEINS FROM CF PATIENTS DIFFERENT FROM THOSE OF NORMAL SUBJECTS",
+    "pids_processed_count": 1240,
+    "top_scoring_pid": 680,
+    "best_maxsim_score": 0.9497853517532349
+  },
+  "3": {
+    "query_text_snippet": "WHAT IS THE LIPID COMPOSITION OF CF RESPIRATORY SECRETIONS",
+    "pids_processed_count": 1240,
+    "top_scoring_pid": 461,
+    "best_maxsim_score": 0.9530560970306396
+  },
+  "4": {
+    "query_text_snippet": "IS CF MUCUS ABNORMAL",
+    "pids_processed_count": 1240,
+    "top_scoring_pid": 980,
+    "best_maxsim_score": 0.9467074871063232
+  },
+  "5": {
+    "query_text_snippet": "WHAT IS THE EFFECT OF WATER OR OTHER THERAPEUTIC AGENTS ON THE PHYSICAL PROPERTIES VISCOSITY ELASTIC...",
+    "pids_processed_count": 1240,
+    "top_scoring_pid": 699,
+    "best_maxsim_score": 0.9627082347869873
+  },
+  "6": {
+    "query_text_snippet": "ARE MUCUS GLYCOPROTEINS DEGRADED DIFFERENTLY IN CF PATIENTS AS COMPARED TO THOSE FROM NORMAL SUBJECT...",
+    "pids_processed_count": 1240,
+    "top_scoring_pid": 592,
+    "best_maxsim_score": 0.9581713080406189
+  },
+  "7": {
+    "query_text_snippet": "WHAT HISTOCHEMICAL DIFFERENCES HAVE BEEN DESCRIBED BETWEEN NORMAL AND CF RESPIRATORY EPITHELIA",
+    "pids_processed_count": 1240,
+    "top_scoring_pid": 872,
+    "best_maxsim_score": 0.9517996907234192
+  },
+  "8": {
+    "query_text_snippet": "WHAT IS THE ASSOCIATION BETWEEN LIVER DISEASE CIRRHOSIS AND VITAMIN A METABOLISM IN CF",
+    "pids_processed_count": 1240,
+    "top_scoring_pid": 1190,
+    "best_maxsim_score": 0.9495284557342529
+  },
+  "9": {
+    "query_text_snippet": "WHAT IS THE ROLE OF VITAMIN E IN THE THERAPY OF PATIENTS WITH CF",
+    "pids_processed_count": 1240,
+    "top_scoring_pid": 799,
+    "best_maxsim_score": 0.9485460519790649
+  },
+  "10": {
+    "query_text_snippet": "WHAT IS THE DIFFERENCE BETWEEN MECONIUM ILEUS AND MECONIUM PLUG SYNDROME",
+    "pids_processed_count": 1240,
+    "top_scoring_pid": 799,
+    "best_maxsim_score": 0.9781486988067627
+  },
+  "11": {
+    "query_text_snippet": "WHAT ABNORMALITIES OF AMINO ACID TRANSPORT HAVE BEEN DESCRIBED IN THE SMALL BOWEL OF CF PATIENTS",
+    "pids_processed_count": 1240,
+    "top_scoring_pid": 46,
+    "best_maxsim_score": 0.9572497606277466
+  },
+  "12": {
+    "query_text_snippet": "WHAT ARE THE CLINICAL OR BIOCHEMICAL FEATURES OF PANCREATITIS IN CF PATIENTS",
+    "pids_processed_count": 1240,
+    "top_scoring_pid": 902,
+    "best_maxsim_score": 0.9596282243728638
+  },
+  "13": {
+    "query_text_snippet": "WHAT NON-INVASIVE TESTS CAN BE PERFORMED FOR THE EVALUATION OF EXOCRINE PANCREATIC FUNCTION IN PATIE...",
+    "pids_processed_count": 1240,
+    "top_scoring_pid": 156,
+    "best_maxsim_score": 0.9688940048217773
+  },
+  "14": {
+    "query_text_snippet": "WHAT ARE THE HEPATIC COMPLICATIONS OR MANIFESTATIONS OF CF",
+    "pids_processed_count": 1240,
+    "top_scoring_pid": 763,
+    "best_maxsim_score": 0.9539542198181152
+  },
+  "15": {
+    "query_text_snippet": "WHAT ARE THE GASTROINTESTINAL COMPLICATIONS OF CF AFTER THE NEONATAL PERIOD EXCLUDE LIVER DISEASE AN...",
+    "pids_processed_count": 1240,
+    "top_scoring_pid": 900,
+    "best_maxsim_score": 0.9701796770095825
+  },
+  "16": {
+    "query_text_snippet": "WHAT IS THE MOST EFFECTIVE REGIMEN FOR THE USE OF PANCREATIC ENZYME SUPPLEMENTS IN THE TREATMENT OF ...",
+    "pids_processed_count": 1240,
+    "top_scoring_pid": 549,
+    "best_maxsim_score": 0.9648899435997009
+  },
+  "17": {
+    "query_text_snippet": "IS DIETARY SUPPLEMENTATION WITH BILE SALTS OF THERAPEUTIC BENEFIT TO CF PATIENTS",
+    "pids_processed_count": 1240,
+    "top_scoring_pid": 656,
+    "best_maxsim_score": 0.9496874213218689
+  },
+  "18": {
+    "query_text_snippet": "WHAT COMPLICATIONS OF PANCREATIC ENZYME THERAPY HAVE BEEN REPORTED IN CF PATIENTS",
+    "pids_processed_count": 1240,
+    "top_scoring_pid": 549,
+    "best_maxsim_score": 0.9647723436355591
+  },
+  "19": {
+    "query_text_snippet": "WHAT IS THE EFFECT OF TREATMENT OF CF PATIENTS WITH ESSENTIAL FATTY ACID SUPPLEMENTS",
+    "pids_processed_count": 1240,
+    "top_scoring_pid": 599,
+    "best_maxsim_score": 0.9537830948829651
+  },
+  "20": {
+    "query_text_snippet": "DOES PANCREATIC INSUFFICIENCY IN CF PATIENTS AFFECT THEIR ABILITY TO ABSORB OR METABOLIZE IRON",
+    "pids_processed_count": 1240,
+    "top_scoring_pid": 549,
+    "best_maxsim_score": 0.9630317091941833
+  },
+  "21": {
+    "query_text_snippet": "WHAT IS THE FREQUENCY OF CF IN NON-CAUCASIAN POPULATIONS",
+    "pids_processed_count": 1240,
+    "top_scoring_pid": 671,
+    "best_maxsim_score": 0.9332951307296753
+  },
+  "22": {
+    "query_text_snippet": "WHAT CONGENITAL OR HEREDITARY DISEASES OR CONDITIONS HAVE BEEN FOUND IN ASSOCIATION WITH CF",
+    "pids_processed_count": 1240,
+    "top_scoring_pid": 237,
+    "best_maxsim_score": 0.93388831615448
+  },
+  "23": {
+    "query_text_snippet": "WHAT ARE THE CHARACTERISTICS OF PATIENTS IN WHOM CF IS INCOMPLETELY MANIFESTED",
+    "pids_processed_count": 1240,
+    "top_scoring_pid": 722,
+    "best_maxsim_score": 0.9345862865447998
+  },
+  "24": {
+    "query_text_snippet": "WHAT EVIDENCE IS THERE THAT THE GENETIC BASIS FOR CF INVOLVES MORE THAN ONE GENE",
+    "pids_processed_count": 1240,
+    "top_scoring_pid": 566,
+    "best_maxsim_score": 0.9353792071342468
+  },
+  "25": {
+    "query_text_snippet": "WHAT IS THE HETEROZYGOTE ADVANTAGE IN CF",
+    "pids_processed_count": 1240,
+    "top_scoring_pid": 285,
+    "best_maxsim_score": 0.9503849148750305
+  },
+  "26": {
+    "query_text_snippet": "WHAT IS THE CONCORDANCE OF CLINICAL OR BIOCHEMICAL MANIFESTATIONS OF CF IN SIBLING PAIRS BOTH OF WHO...",
+    "pids_processed_count": 1240,
+    "top_scoring_pid": 1156,
+    "best_maxsim_score": 0.9540433287620544
+  },
+  "27": {
+    "query_text_snippet": "WHAT IS THE INCIDENCE OF MALE FERTILITY IN CF",
+    "pids_processed_count": 1240,
+    "top_scoring_pid": 514,
+    "best_maxsim_score": 0.9439679384231567
+  },
+  "28": {
+    "query_text_snippet": "WHAT IS THE PATHOLOGY OF THE REPRODUCTIVE SYSTEM MALE OR FEMALE IN CF",
+    "pids_processed_count": 1240,
+    "top_scoring_pid": 837,
+    "best_maxsim_score": 0.9193780422210693
+  },
+  "29": {
+    "query_text_snippet": "WHAT ARE THE RESULTS OF GENETIC COUNSELING OF FAMILIES OF CHILDREN WITH CF",
+    "pids_processed_count": 1240,
+    "top_scoring_pid": 1224,
+    "best_maxsim_score": 0.944428026676178
+  },
+  "30": {
+    "query_text_snippet": "WHAT ARE THE MAJOR PSYCHOLOGICAL OR SOCIAL EFFECTS OF CF ON PATIENTS AND THEIR FAMILIES",
+    "pids_processed_count": 1240,
+    "top_scoring_pid": 620,
+    "best_maxsim_score": 0.9635103940963745
+  },
+  "31": {
+    "query_text_snippet": "WHAT FACTORS INFLUENCE COMPLIANCE WITH PRESCRIBED THERAPY IN CF",
+    "pids_processed_count": 1240,
+    "top_scoring_pid": 184,
+    "best_maxsim_score": 0.9472166895866394
+  },
+  "32": {
+    "query_text_snippet": "WHAT CONDITIONS OR FACTORS LEAD TO ERRONEOUS SWEAT TESTS",
+    "pids_processed_count": 1240,
+    "top_scoring_pid": 825,
+    "best_maxsim_score": 0.9591104984283447
+  },
+  "33": {
+    "query_text_snippet": "WHAT ALTERNATIVE TECHNIQUES OTHER THAN THE CLASSICAL GIBSON-COOKE QUANTITATIVE PILOCARPINE IONTOPHOR...",
+    "pids_processed_count": 1240,
+    "top_scoring_pid": 996,
+    "best_maxsim_score": 0.9629907011985779
+  },
+  "34": {
+    "query_text_snippet": "HAS ANY CF PATIENT BEEN FOUND TO HAVE CONSISTENTLY NORMAL SWEAT TESTS",
+    "pids_processed_count": 1240,
+    "top_scoring_pid": 773,
+    "best_maxsim_score": 0.9604361057281494
+  },
+  "35": {
+    "query_text_snippet": "WHAT IS THE CONCENTRATION OF POTASSIUM IN SWEAT FROM CF PATIENTS",
+    "pids_processed_count": 1240,
+    "top_scoring_pid": 480,
+    "best_maxsim_score": 0.955439031124115
+  },
+  "36": {
+    "query_text_snippet": "WHAT TECHNIQUES ARE AVAILABLE FOR SCREENING OF NEWBORN INFANTS FOR CF AND WHAT FACTORS CONTRIBUTE TO...",
+    "pids_processed_count": 1240,
+    "top_scoring_pid": 492,
+    "best_maxsim_score": 0.9715480208396912
+  },
+  "37": {
+    "query_text_snippet": "CAN CF BE DIAGNOSED PRENATALLY",
+    "pids_processed_count": 1240,
+    "top_scoring_pid": 360,
+    "best_maxsim_score": 0.9273680448532104
+  },
+  "38": {
+    "query_text_snippet": "HOW MAY HETEROZYGOTES FOR CF BE IDENTIFIED",
+    "pids_processed_count": 1240,
+    "top_scoring_pid": 293,
+    "best_maxsim_score": 0.955750584602356
+  },
+  "39": {
+    "query_text_snippet": "OTHER THAN THE SWEAT TEST WHAT TECHNIQUES MAY BE USEFUL BEYOND THE NEONATAL PERIOD FOR THE DIAGNOSIS...",
+    "pids_processed_count": 1240,
+    "top_scoring_pid": 1123,
+    "best_maxsim_score": 0.964214563369751
+  },
+  "40": {
+    "query_text_snippet": "IS VITAMIN D METABOLISM NORMAL IN CF PATIENTS",
+    "pids_processed_count": 1240,
+    "top_scoring_pid": 165,
+    "best_maxsim_score": 0.9561883807182312
+  },
+  "41": {
+    "query_text_snippet": "WHAT ABNORMALITIES OF INSULIN SECRETION OR INSULIN METABOLISM OCCUR IN CF PATIENTS",
+    "pids_processed_count": 1240,
+    "top_scoring_pid": 694,
+    "best_maxsim_score": 0.942874014377594
+  },
+  "42": {
+    "query_text_snippet": "IS SALT SODIUM ANDOR CHLORIDE TRANSPORTPERMEABILITY ABNORMAL IN CF PATIENTS",
+    "pids_processed_count": 1240,
+    "top_scoring_pid": 376,
+    "best_maxsim_score": 0.9480425715446472
+  },
+  "43": {
+    "query_text_snippet": "WHAT STRUCTURAL OR ENZYMATIC DIFFERENCES ARE THERE BETWEEN FIBROBLASTS FROM CF PATIENTS AND NON-CF P...",
+    "pids_processed_count": 1240,
+    "top_scoring_pid": 235,
+    "best_maxsim_score": 0.9515172839164734
+  },
+  "44": {
+    "query_text_snippet": "WHAT ABNORMALITIES OF PROSTAGLANDIN METABOLISM HAVE BEEN DESCRIBED IN CF PATIENTS",
+    "pids_processed_count": 1240,
+    "top_scoring_pid": 1159,
+    "best_maxsim_score": 0.9549413919448853
+  },
+  "45": {
+    "query_text_snippet": "WHAT ARE THE PROPERTIES AND ACTIVITY OF GALACTOSYLTRANSFERASE ENZYMES FROM CF PATIENTS",
+    "pids_processed_count": 1240,
+    "top_scoring_pid": 669,
+    "best_maxsim_score": 0.9399707913398743
+  },
+  "46": {
+    "query_text_snippet": "WHAT DIFFERENCES BETWEEN NORMAL SUBJECTS AND CF PATIENTS HAVE BEEN DESCRIBED IN THE FUNCTION OR META...",
+    "pids_processed_count": 1240,
+    "top_scoring_pid": 210,
+    "best_maxsim_score": 0.9429349303245544
+  },
+  "47": {
+    "query_text_snippet": "DO FIBROBLASTS FROM CF PATIENTS GROW AT A NORMAL RATE",
+    "pids_processed_count": 1240,
+    "top_scoring_pid": 894,
+    "best_maxsim_score": 0.9449155330657959
+  },
+  "48": {
+    "query_text_snippet": "IS RNA METHYLATION OR POLYAMINE METABOLISM NORMAL IN CF PATIENTS",
+    "pids_processed_count": 1240,
+    "top_scoring_pid": 493,
+    "best_maxsim_score": 0.9486719369888306
+  },
+  "49": {
+    "query_text_snippet": "WHAT DEFECTS IN THE SYNTHESIS OR METABOLISM OF CYCLIC NUCLEOTIDES HAVE BEEN DESCRIBED IN CF PATIENTS",
+    "pids_processed_count": 1240,
+    "top_scoring_pid": 566,
+    "best_maxsim_score": 0.9423160552978516
+  },
+  "50": {
+    "query_text_snippet": "WHAT CIRCULATING OR SECRETED FACTORS HAVE BEEN DESCRIBED IN CF",
+    "pids_processed_count": 1240,
+    "top_scoring_pid": 444,
+    "best_maxsim_score": 0.9328258037567139
+  },
+  "51": {
+    "query_text_snippet": "WHAT IS KNOWN ABOUT PROLACTIN IN CF PATIENTS",
+    "pids_processed_count": 1240,
+    "top_scoring_pid": 489,
+    "best_maxsim_score": 0.9435206651687622
+  },
+  "52": {
+    "query_text_snippet": "DOES SECRETORY IGA PROTECT CF PATIENTS AGAINST BACTERIAL COLONIZATION OR INFECTION",
+    "pids_processed_count": 1240,
+    "top_scoring_pid": 1170,
+    "best_maxsim_score": 0.9501473903656006
+  },
+  "53": {
+    "query_text_snippet": "WHAT IS THE RELATIONSHIP OF ALLERGY OR HYPERSENSITIVITY TO LUNG DISEASE IN CF PATIENTS",
+    "pids_processed_count": 1240,
+    "top_scoring_pid": 1060,
+    "best_maxsim_score": 0.9555172920227051
+  },
+  "54": {
+    "query_text_snippet": "WHAT ARE THE INTERACTIONS BETWEEN PROTEASES ENDOGENOUS OR BACTERIAL ORIGIN AND ANTIPROTEASES IN THE ...",
+    "pids_processed_count": 1240,
+    "top_scoring_pid": 479,
+    "best_maxsim_score": 0.9604576826095581
+  },
+  "55": {
+    "query_text_snippet": "WHAT IS THE RELATIONSHIP BETWEEN NUTRITION AND PULMONARY HOST DEFENSES AGAINST BACTERIAL INFECTION I...",
+    "pids_processed_count": 1240,
+    "top_scoring_pid": 1179,
+    "best_maxsim_score": 0.9507415890693665
+  },
+  "56": {
+    "query_text_snippet": "WHAT IS THE PATHOPHYSIOLOGIC ROLE OF CIRCULATING ANTIBODIES TO PSEUDOMONAS AERUGINOSA IN CF PATIENTS",
+    "pids_processed_count": 1240,
+    "top_scoring_pid": 842,
+    "best_maxsim_score": 0.9702816009521484
+  },
+  "57": {
+    "query_text_snippet": "WHAT IS THE IMMUNOLOGIC RESPONSE TO PULMONARY INFECTION IN CF PATIENTS",
+    "pids_processed_count": 1240,
+    "top_scoring_pid": 513,
+    "best_maxsim_score": 0.9768058657646179
+  },
+  "58": {
+    "query_text_snippet": "WHAT IMMUNOLOGIC ABNORMALITIES HAVE BEEN FOUND IN CF PATIENTS",
+    "pids_processed_count": 1240,
+    "top_scoring_pid": 513,
+    "best_maxsim_score": 0.9743520021438599
+  },
+  "59": {
+    "query_text_snippet": "WHAT ARE THE EFFECTS OF CF ON THE PULMONARY CIRCULATION",
+    "pids_processed_count": 1240,
+    "top_scoring_pid": 620,
+    "best_maxsim_score": 0.9667528867721558
+  },
+  "60": {
+    "query_text_snippet": "IS THERE A DEFECT IN MUCOCILIARY TRANSPORT CLEARANCE IN THE RESPIRATORY TRACT OF CF PATIENTS",
+    "pids_processed_count": 1240,
+    "top_scoring_pid": 342,
+    "best_maxsim_score": 0.9643882513046265
+  },
+  "61": {
+    "query_text_snippet": "WHAT ARE THE CLINICAL FEATURES OF LUNG DISEASE IN CF PATIENTS",
+    "pids_processed_count": 1240,
+    "top_scoring_pid": 663,
+    "best_maxsim_score": 0.9447146654129028
+  },
+  "62": {
+    "query_text_snippet": "WHAT ARE THE BIOCHEMICAL OR MICROSCOPIC CHARACTERISTICS OF AIRWAY INFLAMMATION IN CF PATIENTS",
+    "pids_processed_count": 1240,
+    "top_scoring_pid": 358,
+    "best_maxsim_score": 0.9548470377922058
+  },
+  "63": {
+    "query_text_snippet": "HOW DOES LUNG FUNCTION CHANGE WITH TIME IN CF PATIENTS TIME PERIODS",
+    "pids_processed_count": 1240,
+    "top_scoring_pid": 64,
+    "best_maxsim_score": 0.9646852612495422
+  },
+  "64": {
+    "query_text_snippet": "WHAT ARE THE ABNORMALITIES OF PULMONARY FUNCTION IN CF PATIENTS",
+    "pids_processed_count": 1240,
+    "top_scoring_pid": 372,
+    "best_maxsim_score": 0.959464430809021
+  },
+  "65": {
+    "query_text_snippet": "WHAT ARE THE PATHOLOGIC FEATURES OF LUNG DISEASE IN CF PATIENTS",
+    "pids_processed_count": 1240,
+    "top_scoring_pid": 663,
+    "best_maxsim_score": 0.9515335559844971
+  },
+  "66": {
+    "query_text_snippet": "WHAT IS THE PROGNOSIS FOR PATIENTS WHO HAVE HAD AN EPISODE OF RESPIRATORY FAILURE",
+    "pids_processed_count": 1240,
+    "top_scoring_pid": 768,
+    "best_maxsim_score": 0.9547866582870483
+  },
+  "67": {
+    "query_text_snippet": "WHAT ARE THE EFFECTS OF BRONCHODILATORS IN CF PATIENTS",
+    "pids_processed_count": 1240,
+    "top_scoring_pid": 620,
+    "best_maxsim_score": 0.9620609879493713
+  },
+  "68": {
+    "query_text_snippet": "WHAT IS THE BEST WAY TO TREAT PNEUMOTHORAX IN CF PATIENTS",
+    "pids_processed_count": 1240,
+    "top_scoring_pid": 1179,
+    "best_maxsim_score": 0.9451428055763245
+  },
+  "69": {
+    "query_text_snippet": "WHAT IS THE TREATMENT FOR AND PROGNOSIS OF HEMOPTYSIS IN CF PATIENTS",
+    "pids_processed_count": 1240,
+    "top_scoring_pid": 698,
+    "best_maxsim_score": 0.9479259848594666
+  },
+  "70": {
+    "query_text_snippet": "WHAT IS THE PROGNOSIS FOR INFANTS WITH WHEEZING AND CYSTIC FIBROSIS",
+    "pids_processed_count": 1240,
+    "top_scoring_pid": 839,
+    "best_maxsim_score": 0.9778429865837097
+  },
+  "71": {
+    "query_text_snippet": "WHAT IS THE BEST TREATMENT FOR NASAL POLYPS IN CF PATIENTS",
+    "pids_processed_count": 1240,
+    "top_scoring_pid": 552,
+    "best_maxsim_score": 0.9657554030418396
+  },
+  "72": {
+    "query_text_snippet": "HOW EFFECTIVE IS BRONCHIAL LAVAGE IN CF PATIENTS",
+    "pids_processed_count": 1240,
+    "top_scoring_pid": 844,
+    "best_maxsim_score": 0.9641221761703491
+  },
+  "73": {
+    "query_text_snippet": "WHAT ARE THE RESULTS OF MECHANICAL VENTILATION IN CF PATIENTS WITH RESPIRATORY FAILURE",
+    "pids_processed_count": 1240,
+    "top_scoring_pid": 914,
+    "best_maxsim_score": 0.9625843167304993
+  },
+  "74": {
+    "query_text_snippet": "WHAT IS THE BEST TREATMENT FOR PULMONARY HYPERTENSION AND OR COR PULMONALE IN CF PATIENTS",
+    "pids_processed_count": 1240,
+    "top_scoring_pid": 128,
+    "best_maxsim_score": 0.9670639038085938
+  },
+  "75": {
+    "query_text_snippet": "WHAT ARE THE EFFECTS OF EXERCISE TRAINING PROGRAMS ON LUNG FUNCTION IN CF PATIENTS",
+    "pids_processed_count": 1240,
+    "top_scoring_pid": 1023,
+    "best_maxsim_score": 0.9615564346313477
+  },
+  "76": {
+    "query_text_snippet": "WHAT TECHNIQUES ARE EFFECTIVE IN PROMOTING CLEARANCE OF MUCUS FROM THE LUNGS OF CF PATIENTS",
+    "pids_processed_count": 1240,
+    "top_scoring_pid": 592,
+    "best_maxsim_score": 0.9542365074157715
+  },
+  "77": {
+    "query_text_snippet": "WHAT SPECIAL CONSIDERATIONS ARE THERE FOR TREATMENT OF CF PATIENTS WITH ANTIBIOTICS IE ARE THE PHARM...",
+    "pids_processed_count": 1240,
+    "top_scoring_pid": 1179,
+    "best_maxsim_score": 0.9580196142196655
+  },
+  "78": {
+    "query_text_snippet": "WHAT IS THE ROLE OF ORALLY ADMINISTERED ANTIBIOTICS IN THE TREATMENT OF CF PATIENTS",
+    "pids_processed_count": 1240,
+    "top_scoring_pid": 1179,
+    "best_maxsim_score": 0.9491879940032959
+  },
+  "79": {
+    "query_text_snippet": "WHAT IS THE EVIDENCE THAT COMBINATION THERAPY WITH AMINOGLYCOSIDES AND SEMISYNTHETIC PENICILLINS IS ...",
+    "pids_processed_count": 1240,
+    "top_scoring_pid": 1180,
+    "best_maxsim_score": 0.94740229845047
+  },
+  "80": {
+    "query_text_snippet": "HOW EFFECTIVE ARE INHALATIONS OF MUCOLYTIC AGENTS IN THE TREATMENT OF CF PATIENTS",
+    "pids_processed_count": 1240,
+    "top_scoring_pid": 823,
+    "best_maxsim_score": 0.9537638425827026
+  },
+  "81": {
+    "query_text_snippet": "WHAT IS THE ROLE OF AEROSOLS IN THE TREATMENT OF LUNG DISEASE IN CF PATIENTS",
+    "pids_processed_count": 1240,
+    "top_scoring_pid": 1023,
+    "best_maxsim_score": 0.9659587740898132
+  },
+  "82": {
+    "query_text_snippet": "WHAT IS THE ROLE OF BACTERIAL PHAGOCYTOSIS BY ALVEOLAR MACROPHAGES OR POLYMORPHONUCLEAR LEUKOCYTES I...",
+    "pids_processed_count": 1240,
+    "top_scoring_pid": 843,
+    "best_maxsim_score": 0.9558272361755371
+  },
+  "83": {
+    "query_text_snippet": "WHAT IS THE RELATIONSHIP BETWEEN HAEMOPHILUS INFLUENZAE AND PSEUDOMONAS AERUGINOSA IN CF PATIENTS",
+    "pids_processed_count": 1240,
+    "top_scoring_pid": 842,
+    "best_maxsim_score": 0.9710079431533813
+  },
+  "84": {
+    "query_text_snippet": "DO CF PATIENTS EVER DEVELOP INFECTION IN ORGANS OTHER THAN THE LUNG IF SO IN WHAT ORGANS",
+    "pids_processed_count": 1240,
+    "top_scoring_pid": 1091,
+    "best_maxsim_score": 0.9352202415466309
+  },
+  "85": {
+    "query_text_snippet": "WHAT IS THE ROLE OF BACTERIA OTHER THAN PSEUDOMONAS AERUGINOSA STAPHYLOCOCCUS AUREUS OR HAEMOPHILUS ...",
+    "pids_processed_count": 1240,
+    "top_scoring_pid": 550,
+    "best_maxsim_score": 0.9654959440231323
+  },
+  "86": {
+    "query_text_snippet": "WHAT IS THE ROLE OF FUNGI IN THE PATHOGENESIS OF LUNG DISEASE IN CF PATIENTS",
+    "pids_processed_count": 1240,
+    "top_scoring_pid": 663,
+    "best_maxsim_score": 0.9609740376472473
+  },
+  "87": {
+    "query_text_snippet": "WHAT IS THE ROLE OF VIRAL INFECTION IN THE LUNG DISEASE OF CF PATIENTS",
+    "pids_processed_count": 1240,
+    "top_scoring_pid": 1015,
+    "best_maxsim_score": 0.9488697052001953
+  },
+  "88": {
+    "query_text_snippet": "WHAT IS THE EPIDEMIOLOGY OF PSEUDOMONAS AERUGINOSA IN CF PATIENTS",
+    "pids_processed_count": 1240,
+    "top_scoring_pid": 842,
+    "best_maxsim_score": 0.9656253457069397
+  },
+  "89": {
+    "query_text_snippet": "WHAT FACTORS ARE RESPONSIBLE FOR THE APPEARANCE OF MUCOID STRAINS OF PSEUDOMONAS AERUGINOSA IN CF PA...",
+    "pids_processed_count": 1240,
+    "top_scoring_pid": 842,
+    "best_maxsim_score": 0.9674203991889954
+  },
+  "90": {
+    "query_text_snippet": "WHAT ARE THE UNUSUAL MANIFESTATIONS OF CF OTHER THAN LUNG DISEASE OR EXOCRINE PANCREATIC INSUFFICIEN...",
+    "pids_processed_count": 1240,
+    "top_scoring_pid": 984,
+    "best_maxsim_score": 0.9717157483100891
+  },
+  "91": {
+    "query_text_snippet": "WHAT IS THE PROGNOSIS FOR SURVIVAL OF PATIENTS WITH CF",
+    "pids_processed_count": 1240,
+    "top_scoring_pid": 952,
+    "best_maxsim_score": 0.9515678882598877
+  },
+  "92": {
+    "query_text_snippet": "DO CF PATIENTS HAVE NORMAL INTELLIGENCE",
+    "pids_processed_count": 1240,
+    "top_scoring_pid": 722,
+    "best_maxsim_score": 0.9230619668960571
+  },
+  "93": {
+    "query_text_snippet": "WHAT ANIMAL MODELS ARE AVAILABLE WHICH ARE RELEVANT TO CF",
+    "pids_processed_count": 1240,
+    "top_scoring_pid": 435,
+    "best_maxsim_score": 0.9208374619483948
+  },
+  "94": {
+    "query_text_snippet": "WHAT ABNORMALITIES OF SKELETAL MUSCLE FUNCTION OR STRUCTURE HAVE BEEN FOUND IN CF PATIENTS",
+    "pids_processed_count": 1240,
+    "top_scoring_pid": 859,
+    "best_maxsim_score": 0.9320390820503235
+  },
+  "95": {
+    "query_text_snippet": "IS THERE AN INCREASED INCIDENCE OF DENTAL PROBLEMS EG CARIES OR PERIODONTAL DISEASE IN CF PATIENTS",
+    "pids_processed_count": 1240,
+    "top_scoring_pid": 673,
+    "best_maxsim_score": 0.9509386420249939
+  },
+  "96": {
+    "query_text_snippet": "IS OXYGEN TRANSPORT BY RED BLOOD CELLS ABNORMAL IN CF PATIENTS",
+    "pids_processed_count": 1240,
+    "top_scoring_pid": 605,
+    "best_maxsim_score": 0.95337975025177
+  },
+  "97": {
+    "query_text_snippet": "WHAT ARE THE EFFECTS OF CF ON THE DEVELOPMENT AND OR FUNCTION OF THE BRAIN AND CENTRAL NERVOUS SYSTE...",
+    "pids_processed_count": 1240,
+    "top_scoring_pid": 620,
+    "best_maxsim_score": 0.9683738350868225
+  },
+  "98": {
+    "query_text_snippet": "ARE THERE ABNORMALITIES OF TASTE IN CF PATIENTS",
+    "pids_processed_count": 1240,
+    "top_scoring_pid": 449,
+    "best_maxsim_score": 0.9516861438751221
+  },
+  "99": {
+    "query_text_snippet": "WHAT IS THE INCIDENCE OF AND TREATMENT FOR HYPERTROPHIC OSTEOARTHROPATHY IN CF PATIENTS",
+    "pids_processed_count": 1240,
+    "top_scoring_pid": 579,
+    "best_maxsim_score": 0.9484360218048096
+  }
+}
