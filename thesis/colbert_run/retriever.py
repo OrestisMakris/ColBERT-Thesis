@@ -24,7 +24,7 @@ if __name__=='__main__':
         # torch.save(Q_all, "exported_all_query.pt")
         # print(f"Exported all queries with shape: {Q_all.shape}")
         
-        ranking = searcher.search_all(queries, k=100)
+        ranking = searcher.search_all(queries, k=10)
         ranking.save("CF1.nbits=1.rankinggg.tsv")
 
 
