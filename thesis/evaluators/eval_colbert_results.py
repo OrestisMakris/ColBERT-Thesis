@@ -2,10 +2,10 @@ import os, json, glob
 from collections import defaultdict
 
 # Config
-COLBERT_EXPERIMENTS_DIR = "colbert_run/experiments/CF1/retriever/2025-04/04/10.19.19" 
+COLBERT_EXPERIMENTS_DIR = "./experiments/CF44/thesis.colbert_run.retriever/2025-06/05/15.43.20"
 QRELS_PATH = "CF_DataSet/Relevant.txt"
-TOPK_VALUES = [5, 10, 20, 25, 40, 50, 80, 100, 150, 180, 200, 250]
-
+TOPK_VALUES = [5, 10, 20, 25, 40, 50, 80, 100, 150, 180, 200, 250,400,500, 1000]
+#TOPK_VALUES = [5, 10, 20, 25, 40, 50, 80, 100]
 # Hardcoded test queries from test_pairs.jsonl
 #TEST_QUERIES = {1, 6, 18, 20, 23, 28, 30, 34, 35, 36, 37, 38, 45, 46, 49, 63, 75, 85, 94, 96}
 TEST_QUERIES = {0, 1, 8, 10, 11, 14, 18, 22, 27, 34, 35, 36, 41, 42, 51, 57, 59, 79, 84, 94}
@@ -239,7 +239,7 @@ def main():
     print(f"{'='*80}")
     
     # Save results to file
-    output_file = f"colbert_run/colbert_multi_topk_results_{'test' if test_only else 'all'}.txt"
+    output_file = f"thesis/evaluators/__CF__colbert_multi_topk_results_{'test' if test_only else 'all'}.txt"
     with open(output_file, 'w') as f:
         f.write("ColBERT Multi-TOPK Evaluation Results\n")
         f.write(f"{'='*80}\n")
@@ -263,3 +263,6 @@ def main():
 
 if __name__ == "__main__":
     main()
+
+
+    
