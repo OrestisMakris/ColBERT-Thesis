@@ -1,6 +1,3 @@
-{
-    "passage_offset": 0,
-    "num_passages": 1240,
-    "num_embeddings": 177789,
-    "embedding_offset": 0
-}
+version https://git-lfs.github.com/spec/v1
+oid sha256:5ddf489a5e5f7577955b20ffe4db58835f5f231b97ce1d60846ce5fb9742b0a3
+size 111
