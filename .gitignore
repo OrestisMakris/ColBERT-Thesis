@@ -1,4 +1,8 @@
 /data/
+/qd_metrices_all_pairs_cf_tune/
+/padded_matrices_cnn_cf_tune/
+/qd_matrices_all_pairs_cf_tune/
+/padded_matrices_cnn_cf_tune/
 /logs/
 /mlruns/
 /profiler/
