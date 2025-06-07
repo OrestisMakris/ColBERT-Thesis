@@ -44,19 +44,19 @@ import torch
 torch.cuda.empty_cache()
 
 if __name__=='__main__':
-    with Run().context(RunConfig(nranks=1, experiment="Pretrain-DBpedia-10000")):
+    with Run().context(RunConfig(nranks=1, gpus=[],experiment="Pretrain-DBpedia-10000")):
         config = ColBERTConfig(root="../path/to/experiments")
         searcher = Searcher(index="Pretrain-DBpedia-10000", config=config)
         # Export full document embeddings before running retrieval:
         #searcher.ranker.export_all_documents(torch.zeros((1, 224 ,128)))
         queries = Queries("./dbpedia-entity_colbert_format/Queries.tsv")
         # all_query_texts = list(queries.data.values())
-        searcher.ranker.model.to('cpu')
+        
 
         # # Encode all queries at once. The output should have shape: [num_queries, query_maxlen, emb_dim].
         # Q_all = searcher.encode(all_query_texts)
         # torch.save(Q_all, "exported_all_query.pt")
         # print(f"Exported all queries with shape: {Q_all.shape}")
         
-        ranking = searcher.search_all(queries, k=500, use_gpu=False)
+        ranking = searcher.search_all(queries, k=500)
         ranking.save("Pretrain-DBpedia-10000.nbits=1.rankinggg.tsv")
