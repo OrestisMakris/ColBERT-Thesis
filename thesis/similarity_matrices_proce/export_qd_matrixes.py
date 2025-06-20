@@ -1,4 +1,9 @@
-import os
+import os , sys
+
+current_dir   = os.path.dirname(os.path.abspath(__file__))
+project_root  = os.path.join(current_dir, '..', '..')
+sys.path.insert(0, project_root)
+
 import torch
 from colbert.search.index_storage import IndexScorer
 from colbert.infra.config import ColBERTConfig
@@ -52,13 +57,20 @@ def export_colbert_similarity_matrices(
     print_message(f"Original config.checkpoint from metadata: {checkpoint_path_from_metadata}")
     print_message(f"Resolved absolute_checkpoint_path: {absolute_checkpoint_path}")
 
-    config.checkpoint = absolute_checkpoint_path # Update config with resolved path
-    print_message(f"Updated config.checkpoint to: {config.checkpoint}")
-    
+    hf_id = checkpoint_path_from_metadata
+    if os.path.isdir(absolute_checkpoint_path):
+        ckpt_path = absolute_checkpoint_path
+        print_message(f"Using local checkpoint: {ckpt_path}")
+    else:
+        ckpt_path = hf_id
+        print_message(f"Using remote HF checkpoint ID: {ckpt_path}")
+
+    config.checkpoint = ckpt_path
+
     scorer = IndexScorer(index_dir, use_gpu=torch.cuda.is_available())
-    scorer.set_embeddings_strided() # Important for D_packed format
-    
-    checkpoint = Checkpoint(absolute_checkpoint_path, config)
+    scorer.set_embeddings_strided()
+
+    checkpoint = Checkpoint(ckpt_path, config)
 
     num_all_docs_in_index = len(scorer.doclens)
     print_message(f"Found {num_all_docs_in_index} documents in the index.")
@@ -197,3 +209,12 @@ if __name__ == "__main__":
         queries_input, 
         args.save_heatmaps
     )
+
+
+
+
+# python ./thesis/similarity_matrices_proce/export_qd_matrixes.py \
+#   --index /home/st1084516/ColBERT-Thesis/experiments/DBpediacolbert-ir/indexes/DBpediacolbert-ir \
+#   --output_dir ./qd_matrices_beir_untuned \
+#   --queries /home/st1084516/ColBERT-Thesis/dbpedia-entity_colbert_format/Queries.tsv \
+#   --save_heatmaps

@@ -1,22 +1,21 @@
 import os
 import json
 import random
-from beir.datasets.data_loader import GenericDataLoader
 from beir import util
 import multiprocessing
 from tqdm import tqdm
 
 # --- Configuration ---
-dataset_name = "dbpedia-entity"
+dataset_name = "fiqa"
 # Download the dataset if not present
 dataset_url = f"https://public.ukp.informatik.tu-darmstadt.de/thakur/BEIR/datasets/{dataset_name}.zip"
-data_path = util.download_and_unzip(dataset_url, "datasets")
+data_path = util.download_and_unzip(dataset_url, "fiqa")
 
 output_dir = f"{dataset_name}_colbert_format"
 os.makedirs(output_dir, exist_ok=True)
 
-# qrels_split_for_positives = "test" # Original, but test.tsv might be missing
-qrels_split_for_positives = "test" # Using dev as per previous discussions if test.tsv is problematic
+# Process all available splits for relevance information
+qrels_splits_to_process = ["train", "dev", "test"]
 
 # Global maps for worker processes
 doc_to_int_id_map_global = {}
@@ -56,8 +55,6 @@ def generate_triplets_for_query_worker(original_query_id):
         # Ensure int_pos_doc_id is actually in the set of all known int_doc_ids
         # This check is mostly for safety, as it should be if derived from doc_to_int_id_map_global
         if int_pos_doc_id not in all_int_doc_ids_global:
-            # This case should ideally not happen if doc_to_int_id_map_global is consistent with all_int_doc_ids_global
-            # print(f"Warning: Positive doc ID {int_pos_doc_id} not in all_int_doc_ids_global. Skipping.")
             continue
 
         # Create a set of positive IDs for efficient lookup for this query's positives
@@ -109,44 +106,47 @@ with open(os.path.join(data_path, "queries.jsonl"), 'r', encoding='utf-8') as f:
         query = json.loads(line.strip())
         queries_orig[query["_id"]] = query["text"]
 
-# Load qrels (original string IDs for query and doc)
+# Load qrels from all specified splits (original string IDs for query and doc)
 qrels_orig = {}
-qrels_path = os.path.join(data_path, f"qrels/{qrels_split_for_positives}.tsv")
-print(f"Debug: qrels_path = {qrels_path}")
+print(f"Loading qrels from splits: {qrels_splits_to_process}")
 
-try:
-    with open(qrels_path, "r", encoding='utf-8') as f:
-        header = next(f).strip().lower()
-        if not (header.startswith("query-id") or header.startswith("query_id")): # Simple header check
-             # Reset if no header or unexpected header
-            f.seek(0)
-            print(f"Debug: No standard header found or first line is data. Assuming no header.")
-        else:
-            print(f"Debug: Skipped header = {header}")
+for split in qrels_splits_to_process:
+    qrels_path = os.path.join(data_path, f"qrels/{split}.tsv")
+    print(f"Debug: Loading qrels from {qrels_path}")
 
-        for line_num, line in enumerate(f, 1):
-            if line.strip():
-                parts = line.strip().split("\t")
-                if len(parts) >= 3:
-                    # Assuming format: query-id corpus-id score (BEIR default)
-                    # Or query_id Q0 doc_id score (TREC format) - need to adjust index for doc_id
-                    qid_str, did_str, score_str = parts[0], parts[1], parts[2]
-                    if len(parts) == 4 and parts[1].upper() == "Q0": # TREC format like
-                        did_str = parts[2]
-                        score_str = parts[3]
-                    
-                    score = int(score_str)
-                    if qid_str not in qrels_orig:
-                        qrels_orig[qid_str] = {}
-                    qrels_orig[qid_str][did_str] = score
-                else:
-                    print(f"Warning: Skipping line {line_num} with fewer than 3 parts: {line.strip()}")
-except FileNotFoundError:
-    print(f"Error: qrels file not found at {qrels_path}")
-    exit(1)
-except Exception as e3:
-    print(f"Error loading qrels: {e3}")
-    exit(1)
+    try:
+        with open(qrels_path, "r", encoding='utf-8') as f:
+            header = next(f).strip().lower()
+            if not (header.startswith("query-id") or header.startswith("query_id")):
+                f.seek(0)
+                print(f"Debug: No standard header found in {split}.tsv. Assuming no header.")
+            else:
+                print(f"Debug: Skipped header in {split}.tsv: {header}")
+
+            for line_num, line in enumerate(f, 1):
+                if line.strip():
+                    parts = line.strip().split("\t")
+                    if len(parts) >= 3:
+                        # Assuming format: query-id corpus-id score (BEIR default)
+                        # Or query_id Q0 doc_id score (TREC format) - need to adjust index for doc_id
+                        qid_str, did_str, score_str = parts[0], parts[1], parts[2]
+                        if len(parts) == 4 and parts[1].upper() == "Q0": # TREC format like
+                            did_str = parts[2]
+                            score_str = parts[3]
+                        
+                        score = int(score_str)
+                        if qid_str not in qrels_orig:
+                            qrels_orig[qid_str] = {}
+                        # Merge relevance info. If a doc is relevant in multiple splits, the last score wins.
+                        qrels_orig[qid_str][did_str] = score
+                    else:
+                        print(f"Warning: Skipping line {line_num} in {split}.tsv with fewer than 3 parts: {line.strip()}")
+    except FileNotFoundError:
+        print(f"Warning: qrels file not found at {qrels_path}. Skipping this split.")
+    except Exception as e:
+        print(f"Error loading qrels from {qrels_path}: {e}. Skipping this split.")
+
+print("Finished loading all qrels splits.")
 
 print("Direct loading successful!")
 
@@ -214,7 +214,7 @@ else:
 
 
 print(
-    f"Generated {len(triplets)} triplets using '{qrels_split_for_positives}' qrels for positives."
+    f"Generated {len(triplets)} triplets using qrels from {qrels_splits_to_process} for positives."
 )
 
 # Save triplets
@@ -223,9 +223,7 @@ with open(triplets_file, "w", encoding='utf-8') as f:
     for triplet in triplets: # triplet already contains integer IDs
         f.write(json.dumps(triplet) + "\n")
 
-# Relevant .txt (qrels in simple format)
-# This file format is: each line contains space-separated relevant integer document IDs for a query.
-# The line number corresponds to the integer query ID (0-indexed).
+
 relevant_file = os.path.join(output_dir, "Relevant.txt")
 with open(relevant_file, "w", encoding='utf-8') as f:
     # Iterate in the order of integer query IDs

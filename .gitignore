@@ -16,9 +16,9 @@ __pycache__/
 # Jupyter Notebook
 .ipynb_checkpoints
 # notebooks/
-
+experiments/
 # mac
 .DS_Store
-
+qd_matrices_all_pairs_cf_tune/
 # Other
 .vscode

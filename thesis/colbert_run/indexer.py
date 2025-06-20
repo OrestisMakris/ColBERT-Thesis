@@ -8,12 +8,12 @@ from colbert.infra import Run, RunConfig, ColBERTConfig
 from colbert import Indexer
 
 if __name__=='__main__':
-    with Run().context(RunConfig(nranks=1, experiment="Pretrain-DBpedia-10000-4")):
+    with Run().context(RunConfig(nranks=1, experiment="DBpediacolbert-ir-f")):
         config = ColBERTConfig(
-            nbits=4,
+            nbits=8,
         )
-        indexer = Indexer(checkpoint="./experiments/default/none/2025-06/06/15.00.21/checkpoints/colbert-10000", config=config)
-        indexer.index(name="Pretrain-DBpedia-10000-4", collection="./dbpedia-entity_colbert_format/docs.tsv", overwrite=True)
+        indexer = Indexer(checkpoint="./experiments/default/none/2025-06/06/15.00.21/checkpoints/colbert", config=config)
+        indexer.index(name="DBpediacolbert-ir-f", collection="./dbpedia-entity_colbert_format/docs.tsv", overwrite=True)
 
 
 # import sys

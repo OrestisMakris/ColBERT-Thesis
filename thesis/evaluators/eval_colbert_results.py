@@ -2,8 +2,9 @@ import os, json, glob
 from collections import defaultdict
 
 # Config
-COLBERT_EXPERIMENTS_DIR = "./experiments/CF44/thesis.colbert_run.retriever/2025-06/05/15.43.20"
-QRELS_PATH = "CF_DataSet/Relevant.txt"
+COLBERT_EXPERIMENTS_DIR = "./experiments/DBpediacolbert-ir/thesis.colbert_run.retriever/2025-06/10/13.02.23"
+#QRELS_PATH = "CF_DataSet/Relevant.txt"
+QRELS_PATH = "./dbpedia-entity_colbert_format/Relevant.txt"
 TOPK_VALUES = [5, 10, 20, 25, 40, 50, 80, 100, 150, 180, 200, 250,400,500, 1000]
 #TOPK_VALUES = [5, 10, 20, 25, 40, 50, 80, 100]
 # Hardcoded test queries from test_pairs.jsonl
