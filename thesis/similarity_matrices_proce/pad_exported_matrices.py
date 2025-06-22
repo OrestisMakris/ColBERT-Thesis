@@ -7,10 +7,15 @@ import random
 import time
 import matplotlib.pyplot as plt
 import numpy as np
+import sys
+
+current_dir   = os.path.dirname(os.path.abspath(__file__))
+project_root  = os.path.join(current_dir, '..', '..')
+sys.path.insert(0, project_root)
 
 # --- Fixed Configuration ---
-FIXED_INPUT_DIR_NAME = "qd_matrices_all_pairs"
-FIXED_OUTPUT_DIR_NAME = "padded_matrices_cnn"
+FIXED_INPUT_DIR_NAME = "qd_matrices_fiqa_untuned"
+FIXED_OUTPUT_DIR_NAME = "padded_matrices_cnn_fiqa_untuned"
 FIXED_PADDING_VALUE = 0.0
 # --- End Fixed Configuration ---
 

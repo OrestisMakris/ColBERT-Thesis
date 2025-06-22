@@ -7,7 +7,7 @@ sys.path.insert(0, project_root)
 import torch
 from colbert.search.index_storage import IndexScorer
 from colbert.infra.config import ColBERTConfig
-# from colbert.search.strided_tensor import StridedTensor # Not explicitly used in the final version
+
 from colbert.modeling.checkpoint import Checkpoint
 from colbert.utils.utils import print_message
 import matplotlib.pyplot as plt
@@ -214,7 +214,13 @@ if __name__ == "__main__":
 
 
 # python ./thesis/similarity_matrices_proce/export_qd_matrixes.py \
-#   --index /home/st1084516/ColBERT-Thesis/experiments/DBpediacolbert-ir/indexes/DBpediacolbert-ir \
-#   --output_dir ./qd_matrices_beir_untuned \
-#   --queries /home/st1084516/ColBERT-Thesis/dbpedia-entity_colbert_format/Queries.tsv \
+#   --index /home/st1084516/ColBERT-Thesis/experiments/fiqa_colbert_tuned4/indexes/fiqa_colbert_tuned4 \
+#   --output_dir ./qd_matrices_fiqa_untuned \
+#   --queries /home/st1084516/ColBERT-Thesis/fiqa_colbert_format/Queries.tsv \
+#   --save_heatmaps
+
+# python ./thesis/similarity_matrices_proce/export_qd_matrixes.py \
+#   --index /home/st1084516/ColBERT-Thesis/experiments/fiqa_colbert_tuned/indexes/fiqa_colbert_tuned\
+#   --output_dir ./qd_matrices_fiqa_untuned \
+#   --queries /home/st1084516/ColBERT-Thesis/fiqa_colbert_format_gt5/Queries.tsv \
 #   --save_heatmaps

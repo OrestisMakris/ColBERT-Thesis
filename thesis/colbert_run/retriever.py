@@ -44,12 +44,12 @@ import torch
 torch.cuda.empty_cache()
 
 if __name__=='__main__':
-    with Run().context(RunConfig(nranks=1,experiment="DBpediacolbert-ir-f")):
+    with Run().context(RunConfig(nranks=1,experiment="fiqa_colbert_tuned")):
         config = ColBERTConfig(root="../path/to/experiments")
-        searcher = Searcher(index="DBpediacolbert-ir-f", config=config)
+        searcher = Searcher(index="fiqa_colbert_tuned", config=config)
         # Export full document embeddings before running retrieval:
         #searcher.ranker.export_all_documents(torch.zeros((1, 224 ,128)))
-        queries = Queries("./dbpedia-entity_colbert_format/Queries.tsv")
+        queries = Queries("./fiqa_colbert_format_gt5/Queries.tsv")
         # all_query_texts = list(queries.data.values())
         
 
@@ -59,6 +59,6 @@ if __name__=='__main__':
         # print(f"Exported all queries with shape: {Q_all.shape}")
         
         ranking = searcher.search_all(queries, k=500)
-        ranking.save("DBpediacolbert-ir-f.nbits=4.ranking.tsv")
+        ranking.save("fiqa_colbert_tuned.nbits=8.ranking.tsv")
 
         
