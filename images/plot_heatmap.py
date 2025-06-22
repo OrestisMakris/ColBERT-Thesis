@@ -6,7 +6,8 @@ import time
 
 # --- Fixed Configuration ---
 # Change this to the specific .pt file you want to visualize by default
-DEFAULT_PT_FILE_PATH = "/home/st1084516/ColBERT-Thesis/qd_matrices_beir_untuned/q0_d1000.pt"
+DEFAULT_PT_FILE_PATH = "/home/st1084516/ColBERT-Thesis/qd_matrices_fiqa_untuned/q4_d39517.pt"
+#DEFAULT_PT_FILE_PATH = "/home/st1084516/ColBERT-Thesis/qd_matrices_fiqa_untuned/q4_d39513.pt"
 # --- End Fixed Configuration ---
 
 def print_message(message):
