@@ -8,14 +8,16 @@ from colbert.infra import Run, RunConfig, ColBERTConfig
 from colbert import Indexer
 
 if __name__=='__main__':
-    with Run().context(RunConfig(nranks=1, experiment="fiqa_colbert_tuned")):
+    with Run().context(RunConfig(nranks=1, experiment="CF8")):
         config = ColBERTConfig(
             nbits=8,
         )
-        indexer = Indexer(checkpoint="./experiments/default/none/2025-06/23/00.34.24/checkpoints/colbert", config=config)
-        indexer.index(name="fiqa_colbert_tuned", collection="./fiqa_colbert_format_gt5/docs.tsv", overwrite=True)
+        indexer = Indexer(checkpoint="./experiments/default/none/2025-06/25/21.50.20/checkpoints/colbert", config=config)
+        indexer.index(name="CF8", collection="./CF_DataSet/docs.tsv", overwrite=True)
 
-
+#301
+#602
+#1,204
 # import sys
 # import os
 # current_dir = os.path.dirname(os.path.abspath(__file__))

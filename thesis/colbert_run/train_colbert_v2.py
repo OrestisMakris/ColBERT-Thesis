@@ -11,19 +11,19 @@ from colbert import Trainer
 
 def train():
     # construct absolute paths for the dataset files
-    triples = os.path.join(project_root, 'fiqa_colbert_format_gt5', 'triplets.jsonl')
-    queries = os.path.join(project_root, 'fiqa_colbert_format_gt5', 'Queries.tsv')
-    collection = os.path.join(project_root, 'fiqa_colbert_format_gt5', 'docs.tsv')
+    #triples = os.path.join(project_root, 'fiqa_colbert_format_gt5', 'triplets.jsonl')
+    #queries = os.path.join(project_root, 'fiqa_colbert_format_gt5', 'Queries.tsv')
+    #collection = os.path.join(project_root, 'fiqa_colbert_format_gt5', 'docs.tsv')
 
-    # triples = os.path.join(project_root, 'CF_DataSet', 'triplets.jsonl')
-    # queries = os.path.join(project_root, 'CF_DataSet', 'Queries.tsv')
-    # collection = os.path.join(project_root, 'CF_DataSet', 'docs.tsv')
+    triples = os.path.join(project_root, 'CF_DataSet', 'triplets.jsonl')
+    queries = os.path.join(project_root, 'CF_DataSet', 'Queries.tsv')
+    collection = os.path.join(project_root, 'CF_DataSet', 'docs.tsv')
 
     # use 4 gpus (e.g. four A100s, but you can use fewer by changing nway,accumsteps,bsize).
     with Run().context(RunConfig(nranks=1)):
         
 
-        config = ColBERTConfig(bsize=6, lr=1e-04, warmup=20_000, doc_maxlen=160, dim=128, 
+        config = ColBERTConfig(bsize=8, lr=1e-04, warmup=20_000, doc_maxlen=200, dim=128, 
                                 attend_to_mask_tokens=False, nway=2, accumsteps=1, similarity='cosine', 
                                 use_ib_negatives=False)
         trainer = Trainer(triples=triples, queries=queries, collection=collection, config=config)

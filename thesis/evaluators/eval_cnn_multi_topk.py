@@ -4,8 +4,8 @@ from model_cnn import SimpleCNN
 
 # Config
 MATS_DIR = "padded_matrices_cnn"
-CNN_MODEL = "colbert_run/cnn_classifier_v2.pt"
-TEST_PAIRS = "colbert_run/test_pairs.jsonl"
+CNN_MODEL = "thesis/colbert_run/models/cnn_classifier_v2.pt"
+TEST_PAIRS = "thesis/colbert_run//models/test_pairs.jsonl"
 QRELS_PATH = "CF_DataSet/Relevant.txt"
 TOPK_VALUES = [5, 10, 20, 25, 40, 50, 80, 100, 150, 180, 200, 250]
 

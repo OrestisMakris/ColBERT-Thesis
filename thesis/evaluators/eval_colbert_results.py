@@ -2,14 +2,14 @@ import os, json, glob
 from collections import defaultdict
 
 # Config
-COLBERT_EXPERIMENTS_DIR = "./experiments/fiqa_colbert_tuned/thesis.colbert_run.retriever/2025-06/23/00.45.54"
+COLBERT_EXPERIMENTS_DIR = "./experiments/CF6/thesis.colbert_run.retriever/2025-06/25/16.26.56" 
 #QRELS_PATH = "CF_DataSet/Relevant.txt"
-QRELS_PATH = "./fiqa_colbert_format_gt5/Relevant.txt"
+QRELS_PATH = "./CF_DataSet/Relevant.txt"
 TOPK_VALUES = [5, 10, 20, 25, 40, 50, 80, 100, 150, 180, 200, 250,400,500, 1000]
 #TOPK_VALUES = [5, 10, 20, 25, 40, 50, 80, 100]
 # Hardcoded test queries from test_pairs.jsonl
 #TEST_QUERIES = {1, 6, 18, 20, 23, 28, 30, 34, 35, 36, 37, 38, 45, 46, 49, 63, 75, 85, 94, 96}
-TEST_QUERIES = {0, 1, 8, 10, 11, 14, 18, 22, 27, 34, 35, 36, 41, 42, 51, 57, 59, 79, 84, 94}
+TEST_QUERIES = {15,31,68,79,91}
 def load_qrels_from_relevant(path, test_only=False):
     """Load qrels from Relevant.txt where line N = query N-1 (0-indexed)"""
     qrels = {}

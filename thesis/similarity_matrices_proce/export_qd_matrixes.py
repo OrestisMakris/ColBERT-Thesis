@@ -220,7 +220,19 @@ if __name__ == "__main__":
 #   --save_heatmaps
 
 # python ./thesis/similarity_matrices_proce/export_qd_matrixes.py \
-#   --index /home/st1084516/ColBERT-Thesis/experiments/fiqa_colbert_tuned/indexes/fiqa_colbert_tuned\
-#   --output_dir ./qd_matrices_fiqa_untuned \
-#   --queries /home/st1084516/ColBERT-Thesis/fiqa_colbert_format_gt5/Queries.tsv \
+#   --index /home/st1084516/ColBERT-Thesis/experiments/CF6/indexes/CF6 \
+#   --output_dir ./qd_matrices_cf_tune \
+#   --queries /home/st1084516/ColBERT-Thesis/CF_DataSet/Queries.tsv \
+#   --save_heatmaps
+
+# python ./thesis/similarity_matrices_proce/export_qd_matrixes.py \
+#   --index /home/st1084516/ColBERT-Thesis/experiments/CF7/indexes/CF7 \
+#   --output_dir ./qd_matrices_cf_untuned \
+#   --queries /home/st1084516/ColBERT-Thesis/CF_DataSet/Queries.tsv \
+#   --save_heatmaps
+
+# python ./thesis/similarity_matrices_proce/export_qd_matrixes.py \
+#   --index /home/st1084516/ColBERT-Thesis/experiments/CF8/indexes/CF8 \
+#   --output_dir ./qd_matrices_cf_Mtuned \
+#   --queries /home/st1084516/ColBERT-Thesis/CF_DataSet/Queries.tsv \
 #   --save_heatmaps

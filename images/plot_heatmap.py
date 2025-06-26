@@ -127,9 +127,11 @@ import os
 import time
 
 
-INPUT_FILE = "/home/st1084516/ColBERT-Thesis/qd_matrices_fiqa_untuned/q114_d1120.pt"
+#INPUT_FILE = "/home/st1084516/ColBERT-Thesis/qd_matrices_all_pairs_cf_tune/q0_d1186.pt"
+#INPUT_FILE = "/home/st1084516/ColBERT-Thesis/qd_matrices_fiqa_untuned/q1_d21291.pt"
+#INPUT_FILE = "/home/st1084516/ColBERT-Thesis/qd_matrices_fiqa_untuned/q3_d24073.pt"
 OUTPUT_DIR = "/home/st1084516/ColBERT-Thesis/images/heatmaps"
-
+INPUT_FILE = "/home/st1084516/ColBERT-Thesis/qd_matrices_all_pairs_cf_tune/q2_d524.pt"
 CMAP = "viridis"  # Colormap (e.g., "viridis", "plasma", "inferno", "magma", "cividis")
 DPI = 150         # Dots Per Inch for the saved image file
 
