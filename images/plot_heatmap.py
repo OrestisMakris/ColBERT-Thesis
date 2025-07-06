@@ -131,9 +131,21 @@ import time
 #INPUT_FILE = "/home/st1084516/ColBERT-Thesis/qd_matrices_fiqa_untuned/q1_d21291.pt"
 #INPUT_FILE = "/home/st1084516/ColBERT-Thesis/qd_matrices_fiqa_untuned/q3_d24073.pt"
 OUTPUT_DIR = "/home/st1084516/ColBERT-Thesis/images/heatmaps"
-INPUT_FILE = "/home/st1084516/ColBERT-Thesis/qd_matrices_all_pairs_cf_tune/q2_d524.pt"
+#INPUT_FILE = "/home/st1084516/ColBERT-Thesis/qd_matrices_cf_tune/q16_d49.pt"  # 1 p
+#INPUT_FILE = "/home/st1084516/ColBERT-Thesis/qd_matrices_cf_tune/q4_d265.pt"  # 2 p
+#INPUT_FILE = "/home/st1084516/ColBERT-Thesis/qd_matrices_cf_tune/q19_d1049.pt"  # 3 p
+#INPUT_FILE = "/home/st1084516/ColBERT-Thesis/qd_matrices_cf_tune/q36_d3.pt"  # 4 p
+#INPUT_FILE = "/home/st1084516/ColBERT-Thesis/qd_matrices_cf_tune/q66_d1234.pt"  # 5 p
+#INPUT_FILE = "/home/st1084516/ColBERT-Thesis/qd_matrices_cf_tune/q99_d579.pt"  # 6 p
+#INPUT_FILE = "/home/st1084516/ColBERT-Thesis/qd_matrices_cf_tune/q16_d4.pt"  # 1 n
+#INPUT_FILE = "/home/st1084516/ColBERT-Thesis/qd_matrices_cf_tune/q24_d69.pt"  # 2 n
+#INPUT_FILE = "/home/st1084516/ColBERT-Thesis/qd_matrices_cf_tune/q49_d641.pt"  # 3 n
+#INPUT_FILE = "/home/st1084516/ColBERT-Thesis/qd_matrices_cf_tune/q68_d900.pt"  # 4 n
+#INPUT_FILE = "/home/st1084516/ColBERT-Thesis/qd_matrices_cf_tune/q89_d102.pt"  # 5 n
+INPUT_FILE = "/home/st1084516/ColBERT-Thesis/qd_matrices_cf_tune/q99_d578.pt"  # 6 n
+
 CMAP = "viridis"  # Colormap (e.g., "viridis", "plasma", "inferno", "magma", "cividis")
-DPI = 150         # Dots Per Inch for the saved image file
+DPI = 250        # Dots Per Inch for the saved image file
 
 
 def print_message(message):
@@ -152,7 +164,7 @@ if not os.path.exists(INPUT_FILE):
 
 # Determine the output path based on the input filename
 base_filename = os.path.splitext(os.path.basename(INPUT_FILE))[0]
-output_filename = f"_heatmap.png"
+output_filename = f"tunen6_heatmap.png"
 output_path = os.path.join(OUTPUT_DIR, output_filename)
 
 # Load the tensor

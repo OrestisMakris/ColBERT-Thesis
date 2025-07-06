@@ -14,8 +14,7 @@ if __name__=='__main__':
         )
         indexer = Indexer(checkpoint="./experiments/default/none/2025-06/25/21.50.20/checkpoints/colbert", config=config)
         indexer.index(name="CF8", collection="./CF_DataSet/docs.tsv", overwrite=True)
-
-#301
+-
 #602
 #1,204
 # import sys

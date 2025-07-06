@@ -19,3 +19,518 @@ dependencies:
     - ujson
     - flask
     - python-dotenv
+import os, json, argparse, time, glob
+import torch
+import torch.nn.functional as F
+from torch.utils.data import Dataset, DataLoader
+from sklearn.metrics import (
+    accuracy_score, precision_score, recall_score,
+    f1_score, roc_auc_score, confusion_matrix,
+    classification_report
+)
+from model_cnn import SimpleCNN
+
+# --- On-the-fly Padding/Truncation Configuration ---
+# These MUST match the values used during training
+TARGET_QUERY_LEN      = 32
+TARGET_DOC_LEN        = 160
+PADDING_VALUE         = 0.0
+# --- End Configuration ---
+
+def print_message(msg):
+    print(f"[{time.strftime('%Y-%m-%d %H:%M:%S')}] {msg}")
+
+def pad_or_truncate_tensor(tensor, target_shape, padding_value):
+    """Pads or truncates a 2D tensor to a target shape on-the-fly."""
+    target_height, target_width = target_shape
+    tensor = tensor[:target_height, :target_width]
+    current_shape = tensor.shape
+    pad_bottom = max(0, target_height - current_shape[0])
+    pad_right = max(0, target_width - current_shape[1])
+    if pad_bottom > 0 or pad_right > 0:
+        tensor = F.pad(tensor, (0, pad_right, 0, pad_bottom), mode='constant', value=padding_value)
+    return tensor
+
+def count_docs_per_query(mats_dir, test_jsonl):
+    """For each query in test_jsonl, count how many q{qid}_d*.pt files exist."""
+    qids = set()
+    with open(test_jsonl, "r") as f:
+        for line in f:
+            rec = json.loads(line)
+            if isinstance(rec, list) and len(rec)==2:
+                qids.add(rec[0])
+            elif isinstance(rec, dict) and "matrix_file" in rec:
+                qid = int(rec["matrix_file"].split("_d")[0].lstrip("q"))
+                qids.add(qid)
+
+    base = os.path.dirname(__file__)
+    mats_root = os.path.join(base, "..", mats_dir)
+    print_message("Document counts per query:")
+    for qid in sorted(qids):
+        pattern = os.path.join(mats_root, f"q{qid}_d*.pt")
+        files = glob.glob(pattern)
+        print_message(f"  Query {qid }: {len(files)} docs")
+
+class AllPairsTestDataset(Dataset):
+    """
+    Loads all document matrices for test queries and pads/truncates them on-the-fly.
+    """
+    def __init__(self, test_jsonl, mats_dir):
+        base      = os.path.dirname(__file__)
+        mats_root = os.path.join(base, "..", mats_dir)
+        self.target_shape = (TARGET_QUERY_LEN, TARGET_DOC_LEN)
+
+        qrels = {}
+        with open(test_jsonl, "r") as f:
+            for line in f:
+                qid, did = json.loads(line)
+                qrels.setdefault(qid, set()).add(did)
+
+        self.samples = []
+        for qid, pos_set in qrels.items():
+            pattern = os.path.join(mats_root, f"q{qid}_d*.pt")
+            for path in glob.glob(pattern):
+                fname = os.path.basename(path)
+                did   = int(fname.split("_d")[1].split(".pt")[0])
+                label = 1 if did in pos_set else 0
+                self.samples.append((fname, label))
+        self.mats = mats_root
+
+    def __len__(self):
+        return len(self.samples)
+
+    def __getitem__(self, idx):
+        fname, label = self.samples[idx]
+        mat = torch.load(os.path.join(self.mats, fname), map_location="cpu")
+        mat = pad_or_truncate_tensor(mat, self.target_shape, PADDING_VALUE)
+        if mat.ndim == 2:
+            mat = mat.unsqueeze(0)
+        return mat, torch.tensor(label, dtype=torch.float)
+
+def main():
+    parser = argparse.ArgumentParser(description="Evaluate CNN as classifier")
+    parser.add_argument("--model",      required=True, help="path to .pt model")
+    parser.add_argument("--test_jsonl", required=True, help="JSONL of positive test pairs [qid, did]")
+    parser.add_argument("--mats_dir",   default="qd_matrices_fiqa_untuned", help="Folder with original (unpadded) q*.pt files")
+    parser.add_argument("--batch_size", type=int, default=32)
+    args = parser.parse_args()
+
+    count_docs_per_query(args.mats_dir, args.test_jsonl)
+
+    print_message(f"Loading model from {args.model}")
+    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+    model  = SimpleCNN(query_len=TARGET_QUERY_LEN, doc_len=TARGET_DOC_LEN).to(device)
+    model.load_state_dict(torch.load(args.model, map_location=device))
+    model.eval()
+
+    ds = AllPairsTestDataset(args.test_jsonl, args.mats_dir)
+    dl = DataLoader(ds, batch_size=args.batch_size, shuffle=False, pin_memory=(device.type=="cuda"), num_workers=4)
+
+    y_true, y_score = [], []
+    with torch.no_grad():
+        for mats, labels in tqdm(dl, desc="Evaluating"):
+            mats   = mats.to(device)
+            logits = model(mats)
+            probs  = torch.sigmoid(logits).cpu().tolist()
+            y_score.extend(probs)
+            y_true .extend(labels.tolist())
+
+    thr = 0.5
+    print_message(f"Using fixed threshold = {thr:.2f}")
+    y_pred = [1 if p >= thr else 0 for p in y_score]
+
+    print("\n=== Classification Metrics ===")
+    print(f"Accuracy : {accuracy_score(y_true, y_pred):.4f}")
+    print(f"Precision: {precision_score(y_true, y_pred, zero_division=0):.4f}")
+    print(f"Recall   : {recall_score(y_true, y_pred, zero_division=0):.4f}")
+    print(f"F1-score : {f1_score(y_true, y_pred, zero_division=0):.4f}")
+    try:
+        print(f"ROC-AUC  : {roc_auc_score(y_true, y_score):.4f}")
+    except ValueError:
+        print("ROC-AUC could not be calculated (only one class present in y_true).")
+    
+    print("\n=== Classification Report ===")
+    print(classification_report(y_true, y_pred, digits=4, zero_division=0))
+
+    cm = confusion_matrix(y_true, y_pred)
+    print("\nConfusion Matrix:")
+    print(cm)
+
+if __name__ == "__main__":
+    main()
+```
+
+### 2. Updated `eval_cnn_multi_topk.py`
+
+This version now pads each matrix individually before scoring it.
+
+````python
+# filepath: /home/st1084516/ColBERT-Thesis/thesis/evaluators/eval_cnn_multi_topk.py
+import os, json, glob, torch
+import torch.nn.functional as F
+from collections import defaultdict
+from tqdm import tqdm
+from model_cnn import SimpleCNN
+
+# --- Configuration ---
+MATS_DIR = "qd_matrices_fiqa_untuned" # Point to original, unpadded matrices
+CNN_MODEL = "cnn_classifier_best_f1.pt"
+TEST_PAIRS = "colbert_run/test_pairs.jsonl"
+QRELS_PATH = "fiqa_colbert_format_gt5/Relevant.txt"
+TOPK_VALUES = [1, 5, 10, 20, 50, 100]
+
+# --- On-the-fly Padding/Truncation Configuration ---
+# These MUST match the values used during training
+TARGET_QUERY_LEN      = 32
+TARGET_DOC_LEN        = 160
+PADDING_VALUE         = 0.0
+# --- End Configuration ---
+
+def pad_or_truncate_tensor(tensor, target_shape, padding_value):
+    """Pads or truncates a 2D tensor to a target shape on-the-fly."""
+    target_height, target_width = target_shape
+    tensor = tensor[:target_height, :target_width]
+    current_shape = tensor.shape
+    pad_bottom = max(0, target_height - current_shape[0])
+    pad_right = max(0, target_width - current_shape[1])
+    if pad_bottom > 0 or pad_right > 0:
+        tensor = F.pad(tensor, (0, pad_right, 0, pad_bottom), mode='constant', value=padding_value)
+    return tensor
+
+def load_qrels_from_relevant(path):
+    """Load qrels from Relevant.txt where line N = query N-1 (0-indexed)"""
+    qrels = {}
+    with open(path, 'r') as f:
+        for qid, line in enumerate(f, start=0):
+            relevant_docs = {int(doc_str) for doc_str in line.strip().split() if doc_str.isdigit()}
+            if relevant_docs:
+                qrels[qid] = relevant_docs
+    return qrels
+
+def score_all_for_query(qid, model, device, mats_dir, topk):
+    """Score all documents for a given query and return top-k"""
+    files = glob.glob(f"{mats_dir}/q{qid}_d*.pt")
+    scores = []
+    target_shape = (TARGET_QUERY_LEN, TARGET_DOC_LEN)
+    
+    for full_path in files:
+        did = int(os.path.basename(full_path).split("_")[1][1:-3])
+        mat = torch.load(full_path, map_location="cpu")
+        mat = pad_or_truncate_tensor(mat, target_shape, PADDING_VALUE)
+        
+        if mat.ndim == 2: mat = mat.unsqueeze(0) # Add channel dim
+        mat = mat.unsqueeze(0).to(device) # Add batch dim
+        
+        with torch.no_grad():
+            score = model(mat).item()
+        scores.append((did, score))
+    
+    return sorted(scores, key=lambda x: x[1], reverse=True)[:topk]
+
+def average_precision(retrieved_docs, relevant_docs):
+    if not relevant_docs: return 0.0
+    hits, sum_precisions = 0, 0.0
+    for i, doc_id in enumerate(retrieved_docs, 1):
+        if doc_id in relevant_docs:
+            hits += 1
+            sum_precisions += hits / i
+    return sum_precisions / len(relevant_docs)
+
+def reciprocal_rank(retrieved_docs, relevant_docs):
+    for i, doc_id in enumerate(retrieved_docs, 1):
+        if doc_id in relevant_docs: return 1.0 / i
+    return 0.0
+
+def evaluate_cnn_at_k(model, device, qrels, mats_dir, topk):
+    """Evaluate CNN at specific topk"""
+    total_map, total_mrr = 0.0, 0.0
+    
+    qids_to_eval = [qid for qid in qrels if glob.glob(f"{mats_dir}/q{qid}_d*.pt")]
+    if not qids_to_eval: return None
+
+    for qid in tqdm(qids_to_eval, desc=f"Eval k={topk}", leave=False):
+        ranked_results = score_all_for_query(qid, model, device, mats_dir, topk)
+        retrieved_docs = [did for did, score in ranked_results]
+        relevant_docs = qrels[qid]
+        total_map += average_precision(retrieved_docs, relevant_docs)
+        total_mrr += reciprocal_rank(retrieved_docs, relevant_docs)
+    
+    return {'MAP': total_map / len(qids_to_eval), 'MRR': total_mrr / len(qids_to_eval), 'num_queries': len(qids_to_eval)}
+
+def main():
+    print("=== CNN Multi-TOPK Evaluation ===")
+    qrels = load_qrels_from_relevant(QRELS_PATH)
+    print(f"Loaded {len(qrels)} queries from {QRELS_PATH}")
+    
+    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+    print(f"Using device: {device}")
+    cnn = SimpleCNN(query_len=TARGET_QUERY_LEN, doc_len=TARGET_DOC_LEN).to(device).eval()
+    cnn.load_state_dict(torch.load(CNN_MODEL, map_location=device))
+    print(f"Loaded CNN model from: {CNN_MODEL}")
+    
+    print(f"\n{'='*40}\n{'TOPK':<6} {'Queries':<8} {'MAP':<8} {'MRR':<8}\n{'='*40}")
+    
+    for topk in TOPK_VALUES:
+        results = evaluate_cnn_at_k(cnn, device, qrels, MATS_DIR, topk)
+        if results:
+            print(f"{topk:<6} {results['num_queries']:<8} {results['MAP']:<8.4f} {results['MRR']:<8.4f}")
+    print(f"{'='*40}")
+
+if __name__ == "__main__":
+    main()
+```# filepath: /home/st1084516/ColBERT-Thesis/thesis/eval_class.py
+import os, json, argparse, time, glob
+import torch
+import torch.nn.functional as F
+from torch.utils.data import Dataset, DataLoader
+from sklearn.metrics import (
+    accuracy_score, precision_score, recall_score,
+    f1_score, roc_auc_score, confusion_matrix,
+    classification_report
+)
+from model_cnn import SimpleCNN
+
+# --- On-the-fly Padding/Truncation Configuration ---
+# These MUST match the values used during training
+TARGET_QUERY_LEN      = 32
+TARGET_DOC_LEN        = 160
+PADDING_VALUE         = 0.0
+# --- End Configuration ---
+
+def print_message(msg):
+    print(f"[{time.strftime('%Y-%m-%d %H:%M:%S')}] {msg}")
+
+def pad_or_truncate_tensor(tensor, target_shape, padding_value):
+    """Pads or truncates a 2D tensor to a target shape on-the-fly."""
+    target_height, target_width = target_shape
+    tensor = tensor[:target_height, :target_width]
+    current_shape = tensor.shape
+    pad_bottom = max(0, target_height - current_shape[0])
+    pad_right = max(0, target_width - current_shape[1])
+    if pad_bottom > 0 or pad_right > 0:
+        tensor = F.pad(tensor, (0, pad_right, 0, pad_bottom), mode='constant', value=padding_value)
+    return tensor
+
+def count_docs_per_query(mats_dir, test_jsonl):
+    """For each query in test_jsonl, count how many q{qid}_d*.pt files exist."""
+    qids = set()
+    with open(test_jsonl, "r") as f:
+        for line in f:
+            rec = json.loads(line)
+            if isinstance(rec, list) and len(rec)==2:
+                qids.add(rec[0])
+            elif isinstance(rec, dict) and "matrix_file" in rec:
+                qid = int(rec["matrix_file"].split("_d")[0].lstrip("q"))
+                qids.add(qid)
+
+    base = os.path.dirname(__file__)
+    mats_root = os.path.join(base, "..", mats_dir)
+    print_message("Document counts per query:")
+    for qid in sorted(qids):
+        pattern = os.path.join(mats_root, f"q{qid}_d*.pt")
+        files = glob.glob(pattern)
+        print_message(f"  Query {qid }: {len(files)} docs")
+
+class AllPairsTestDataset(Dataset):
+    """
+    Loads all document matrices for test queries and pads/truncates them on-the-fly.
+    """
+    def __init__(self, test_jsonl, mats_dir):
+        base      = os.path.dirname(__file__)
+        mats_root = os.path.join(base, "..", mats_dir)
+        self.target_shape = (TARGET_QUERY_LEN, TARGET_DOC_LEN)
+
+        qrels = {}
+        with open(test_jsonl, "r") as f:
+            for line in f:
+                qid, did = json.loads(line)
+                qrels.setdefault(qid, set()).add(did)
+
+        self.samples = []
+        for qid, pos_set in qrels.items():
+            pattern = os.path.join(mats_root, f"q{qid}_d*.pt")
+            for path in glob.glob(pattern):
+                fname = os.path.basename(path)
+                did   = int(fname.split("_d")[1].split(".pt")[0])
+                label = 1 if did in pos_set else 0
+                self.samples.append((fname, label))
+        self.mats = mats_root
+
+    def __len__(self):
+        return len(self.samples)
+
+    def __getitem__(self, idx):
+        fname, label = self.samples[idx]
+        mat = torch.load(os.path.join(self.mats, fname), map_location="cpu")
+        mat = pad_or_truncate_tensor(mat, self.target_shape, PADDING_VALUE)
+        if mat.ndim == 2:
+            mat = mat.unsqueeze(0)
+        return mat, torch.tensor(label, dtype=torch.float)
+
+def main():
+    parser = argparse.ArgumentParser(description="Evaluate CNN as classifier")
+    parser.add_argument("--model",      required=True, help="path to .pt model")
+    parser.add_argument("--test_jsonl", required=True, help="JSONL of positive test pairs [qid, did]")
+    parser.add_argument("--mats_dir",   default="qd_matrices_fiqa_untuned", help="Folder with original (unpadded) q*.pt files")
+    parser.add_argument("--batch_size", type=int, default=32)
+    args = parser.parse_args()
+
+    count_docs_per_query(args.mats_dir, args.test_jsonl)
+
+    print_message(f"Loading model from {args.model}")
+    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+    model  = SimpleCNN(query_len=TARGET_QUERY_LEN, doc_len=TARGET_DOC_LEN).to(device)
+    model.load_state_dict(torch.load(args.model, map_location=device))
+    model.eval()
+
+    ds = AllPairsTestDataset(args.test_jsonl, args.mats_dir)
+    dl = DataLoader(ds, batch_size=args.batch_size, shuffle=False, pin_memory=(device.type=="cuda"), num_workers=4)
+
+    y_true, y_score = [], []
+    with torch.no_grad():
+        for mats, labels in tqdm(dl, desc="Evaluating"):
+            mats   = mats.to(device)
+            logits = model(mats)
+            probs  = torch.sigmoid(logits).cpu().tolist()
+            y_score.extend(probs)
+            y_true .extend(labels.tolist())
+
+    thr = 0.5
+    print_message(f"Using fixed threshold = {thr:.2f}")
+    y_pred = [1 if p >= thr else 0 for p in y_score]
+
+    print("\n=== Classification Metrics ===")
+    print(f"Accuracy : {accuracy_score(y_true, y_pred):.4f}")
+    print(f"Precision: {precision_score(y_true, y_pred, zero_division=0):.4f}")
+    print(f"Recall   : {recall_score(y_true, y_pred, zero_division=0):.4f}")
+    print(f"F1-score : {f1_score(y_true, y_pred, zero_division=0):.4f}")
+    try:
+        print(f"ROC-AUC  : {roc_auc_score(y_true, y_score):.4f}")
+    except ValueError:
+        print("ROC-AUC could not be calculated (only one class present in y_true).")
+    
+    print("\n=== Classification Report ===")
+    print(classification_report(y_true, y_pred, digits=4, zero_division=0))
+
+    cm = confusion_matrix(y_true, y_pred)
+    print("\nConfusion Matrix:")
+    print(cm)
+
+if __name__ == "__main__":
+    main()
+```
+
+### 2. Updated `eval_cnn_multi_topk.py`
+
+This version now pads each matrix individually before scoring it.
+
+````python
+# filepath: /home/st1084516/ColBERT-Thesis/thesis/evaluators/eval_cnn_multi_topk.py
+import os, json, glob, torch
+import torch.nn.functional as F
+from collections import defaultdict
+from tqdm import tqdm
+from model_cnn import SimpleCNN
+
+# --- Configuration ---
+MATS_DIR = "qd_matrices_fiqa_untuned" # Point to original, unpadded matrices
+CNN_MODEL = "cnn_classifier_best_f1.pt"
+TEST_PAIRS = "colbert_run/test_pairs.jsonl"
+QRELS_PATH = "fiqa_colbert_format_gt5/Relevant.txt"
+TOPK_VALUES = [1, 5, 10, 20, 50, 100]
+
+# --- On-the-fly Padding/Truncation Configuration ---
+# These MUST match the values used during training
+TARGET_QUERY_LEN      = 32
+TARGET_DOC_LEN        = 160
+PADDING_VALUE         = 0.0
+# --- End Configuration ---
+
+def pad_or_truncate_tensor(tensor, target_shape, padding_value):
+    """Pads or truncates a 2D tensor to a target shape on-the-fly."""
+    target_height, target_width = target_shape
+    tensor = tensor[:target_height, :target_width]
+    current_shape = tensor.shape
+    pad_bottom = max(0, target_height - current_shape[0])
+    pad_right = max(0, target_width - current_shape[1])
+    if pad_bottom > 0 or pad_right > 0:
+        tensor = F.pad(tensor, (0, pad_right, 0, pad_bottom), mode='constant', value=padding_value)
+    return tensor
+
+def load_qrels_from_relevant(path):
+    """Load qrels from Relevant.txt where line N = query N-1 (0-indexed)"""
+    qrels = {}
+    with open(path, 'r') as f:
+        for qid, line in enumerate(f, start=0):
+            relevant_docs = {int(doc_str) for doc_str in line.strip().split() if doc_str.isdigit()}
+            if relevant_docs:
+                qrels[qid] = relevant_docs
+    return qrels
+
+def score_all_for_query(qid, model, device, mats_dir, topk):
+    """Score all documents for a given query and return top-k"""
+    files = glob.glob(f"{mats_dir}/q{qid}_d*.pt")
+    scores = []
+    target_shape = (TARGET_QUERY_LEN, TARGET_DOC_LEN)
+    
+    for full_path in files:
+        did = int(os.path.basename(full_path).split("_")[1][1:-3])
+        mat = torch.load(full_path, map_location="cpu")
+        mat = pad_or_truncate_tensor(mat, target_shape, PADDING_VALUE)
+        
+        if mat.ndim == 2: mat = mat.unsqueeze(0) # Add channel dim
+        mat = mat.unsqueeze(0).to(device) # Add batch dim
+        
+        with torch.no_grad():
+            score = model(mat).item()
+        scores.append((did, score))
+    
+    return sorted(scores, key=lambda x: x[1], reverse=True)[:topk]
+
+def average_precision(retrieved_docs, relevant_docs):
+    if not relevant_docs: return 0.0
+    hits, sum_precisions = 0, 0.0
+    for i, doc_id in enumerate(retrieved_docs, 1):
+        if doc_id in relevant_docs:
+            hits += 1
+            sum_precisions += hits / i
+    return sum_precisions / len(relevant_docs)
+
+def reciprocal_rank(retrieved_docs, relevant_docs):
+    for i, doc_id in enumerate(retrieved_docs, 1):
+        if doc_id in relevant_docs: return 1.0 / i
+    return 0.0
+
+def evaluate_cnn_at_k(model, device, qrels, mats_dir, topk):
+    """Evaluate CNN at specific topk"""
+    total_map, total_mrr = 0.0, 0.0
+    
+    qids_to_eval = [qid for qid in qrels if glob.glob(f"{mats_dir}/q{qid}_d*.pt")]
+    if not qids_to_eval: return None
+
+    for qid in tqdm(qids_to_eval, desc=f"Eval k={topk}", leave=False):
+        ranked_results = score_all_for_query(qid, model, device, mats_dir, topk)
+        retrieved_docs = [did for did, score in ranked_results]
+        relevant_docs = qrels[qid]
+        total_map += average_precision(retrieved_docs, relevant_docs)
+        total_mrr += reciprocal_rank(retrieved_docs, relevant_docs)
+    
+    return {'MAP': total_map / len(qids_to_eval), 'MRR': total_mrr / len(qids_to_eval), 'num_queries': len(qids_to_eval)}
+
+def main():
+    print("=== CNN Multi-TOPK Evaluation ===")
+    qrels = load_qrels_from_relevant(QRELS_PATH)
+    print(f"Loaded {len(qrels)} queries from {QRELS_PATH}")
+    
+    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+    print(f"Using device: {device}")
+    cnn = SimpleCNN(query_len=TARGET_QUERY_LEN, doc_len=TARGET_DOC_LEN).to(device).eval()
+    cnn.load_state_dict(torch.load(CNN_MODEL, map_location=device))
+    print(f"Loaded CNN model from: {CNN_MODEL}")
+    
+    print(f"\n{'='*40}\n{'TOPK':<6} {'Queries':<8} {'MAP':<8} {'MRR':<8}\n{'='*40}")
+    
+    for topk in TOPK_VALUES:
+        results = evaluate_cnn_at_k(cnn, device, qrels, MATS_DIR, topk)
+        if results:
+            print(f"{topk:<6} {results['num_queries']:<8} {results['MAP']:<8.4f}

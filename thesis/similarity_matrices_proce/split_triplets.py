@@ -172,18 +172,18 @@ INPUT_TRIPLETS = os.path.join(
 # --- NEW: Updated output filenames ---
 TRAIN_OUT = os.path.join(
     os.getcwd(),
-    "thesis/cf_run_latest",
-    "train_triplets_cf.jsonl"
+    "thesis/cf_run_untuned",
+    "train_triplets_cf_sm.jsonl"
 )
 VALIDATION_OUT = os.path.join(
     os.getcwd(),
-    "thesis/cf_run_latest",
-    "validation_triplets_cf.jsonl" # Changed from _pairs to _triplets
+    "thesis/cf_run_untuned",
+    "validation_triplets_cf_sm.jsonl" # Changed from _pairs to _triplets
 )
 TEST_OUT = os.path.join(
     os.getcwd(),
-    "thesis/cf_run_latest",
-    "test_triplets_cf.jsonl" # Changed from _pairs to _triplets
+    "thesis/cf_run_untuned",
+    "test_triplets_cf_sm.jsonl" # Changed from _pairs to _triplets
 )
 
 TRAIN_RATIO = 0.9
