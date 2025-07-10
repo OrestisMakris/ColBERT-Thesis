@@ -23,7 +23,7 @@ def train():
     with Run().context(RunConfig(nranks=1)):
         
 
-        config = ColBERTConfig(bsize=8, lr=1e-04, warmup=20_000, doc_maxlen=200, dim=128, 
+        config = ColBERTConfig(bsize=64, lr=1e-04, warmup=20_000, doc_maxlen=200, dim=128, 
                                 attend_to_mask_tokens=False, nway=2, accumsteps=1, similarity='cosine', 
                                 use_ib_negatives=False)
         trainer = Trainer(triples=triples, queries=queries, collection=collection, config=config)

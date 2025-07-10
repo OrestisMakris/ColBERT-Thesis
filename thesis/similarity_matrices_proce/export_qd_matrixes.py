@@ -236,3 +236,11 @@ if __name__ == "__main__":
 #   --output_dir ./qd_matrices_cf_Mtuned \
 #   --queries /home/st1084516/ColBERT-Thesis/CF_DataSet/Queries.tsv \
 #   --save_heatmaps
+
+
+
+# python ./thesis/similarity_matrices_proce/export_qd_matrixes.py \
+#   --index /home/st1084516/ColBERT-Thesis/experiments/CF11/indexes/CF11 \
+#   --output_dir ./qd_matrices_cf_Mediumtuned \
+#   --queries /home/st1084516/ColBERT-Thesis/CF_DataSet/Queries.tsv \
+#   --save_heatmaps

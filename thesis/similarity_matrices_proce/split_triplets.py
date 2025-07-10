@@ -172,22 +172,22 @@ INPUT_TRIPLETS = os.path.join(
 # --- NEW: Updated output filenames ---
 TRAIN_OUT = os.path.join(
     os.getcwd(),
-    "thesis/cf_run_untuned",
-    "train_triplets_cf_sm.jsonl"
+    "thesis/cf_run_Mediumtuned",
+    "train_triplets_60.jsonl"
 )
 VALIDATION_OUT = os.path.join(
     os.getcwd(),
-    "thesis/cf_run_untuned",
-    "validation_triplets_cf_sm.jsonl" # Changed from _pairs to _triplets
+    "thesis/cf_run_Mediumtuned",
+    "validation_triplets_60.jsonl" # Changed from _pairs to _triplets
 )
 TEST_OUT = os.path.join(
     os.getcwd(),
-    "thesis/cf_run_untuned",
-    "test_triplets_cf_sm.jsonl" # Changed from _pairs to _triplets
+    "thesis/cf_run_Mediumtuned",
+    "test_triplets_60.jsonl" # Changed from _pairs to _triplets
 )
 
-TRAIN_RATIO = 0.9
-VALIDATION_RATIO = 0.05
+TRAIN_RATIO = 0.6
+VALIDATION_RATIO = 0.1
 # TEST_RATIO is implicitly (1.0 - TRAIN_RATIO - VALIDATION_RATIO)
 
 NEGATIVES_PER_POSITIVE = 1 # Create this many training examples for each (q, p) pair

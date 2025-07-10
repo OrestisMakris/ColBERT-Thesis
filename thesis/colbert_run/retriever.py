@@ -44,9 +44,9 @@ import torch
 torch.cuda.empty_cache()
 
 if __name__=='__main__':
-    with Run().context(RunConfig(nranks=1,experiment="CF8")):
+    with Run().context(RunConfig(nranks=1,experiment="CF11")):
         config = ColBERTConfig(root="../path/to/experiments")
-        searcher = Searcher(index="CF8", config=config)
+        searcher = Searcher(index="CF11", config=config)
         # Export full document embeddings before running retrieval:
         #searcher.ranker.export_all_documents(torch.zeros((1, 224 ,128)))
         queries = Queries("./CF_DataSet/Queries.tsv")
@@ -59,6 +59,6 @@ if __name__=='__main__':
         # print(f"Exported all queries with shape: {Q_all.shape}")
         
         ranking = searcher.search_all(queries, k=1000)
-        ranking.save("CF8.nbits=8.ranking.tsv")
+        ranking.save("CF11Time.nbits=4.ranking_time.tsv")
 
         

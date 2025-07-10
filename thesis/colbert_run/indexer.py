@@ -8,13 +8,13 @@ from colbert.infra import Run, RunConfig, ColBERTConfig
 from colbert import Indexer
 
 if __name__=='__main__':
-    with Run().context(RunConfig(nranks=1, experiment="CF8")):
+    with Run().context(RunConfig(nranks=1, experiment="CF11")):
         config = ColBERTConfig(
-            nbits=8,
+            nbits=4,
         )
-        indexer = Indexer(checkpoint="./experiments/default/none/2025-06/25/21.50.20/checkpoints/colbert", config=config)
-        indexer.index(name="CF8", collection="./CF_DataSet/docs.tsv", overwrite=True)
--
+        indexer = Indexer(checkpoint="./experiments/default/none/2025-07/09/02.21.52/checkpoints/colbert", config=config)
+        indexer.index(name="CF11", collection="./CF_DataSet/docs.tsv", overwrite=True)
+
 #602
 #1,204
 # import sys
@@ -38,3 +38,6 @@ if __name__=='__main__':
 #         indexer.index(name="CF44", collection="./CF_DataSet/docs.tsv", overwrite=True)
 
 
+#302 9
+#150 10
+#75  11

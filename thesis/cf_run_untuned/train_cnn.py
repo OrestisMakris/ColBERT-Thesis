@@ -28,6 +28,7 @@ PADDING_VALUE         = 0.0
 
 LR                    = 1e-4
 EPOCHS                = 80
+EPOCHS                = 80
 BATCH_SIZE            = 4
 NORMALIZE_MATRICES    = False
 # --- End Configuration ---
