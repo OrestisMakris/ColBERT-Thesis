@@ -104,6 +104,7 @@ class Searcher:
 
     def dense_search(self, Q: torch.Tensor, k=10, filter_fn=None, pids=None):
         print("DEBUG: Entered dense_search", flush=True)
+        
         # Configuration branch based on k.
         if k <= 10:
             if self.config.ncells is None:
@@ -127,7 +128,19 @@ class Searcher:
             if self.config.ndocs is None:
                 self.configure(ndocs=max(k * 4, 4096))
 
+
+        start_time = time.time()
+        
+
         pids, scores = self.ranker.rank(self.config, Q, filter_fn=filter_fn, pids=pids)
+
+
+
+        end_time = time.time()
+        elapsed = end_time - start_time
+        print(f"[TIMING] dense_search for {Q.size(0)} query vectors and {len(pids)} pids took: {elapsed:.4f} seconds.")
+
+
         print(f"DEBUG: dense_search returning {len(pids)} pids and {len(scores)} scores", flush=True)
         return pids[:k], list(range(1, k+1)), scores[:k]
     
