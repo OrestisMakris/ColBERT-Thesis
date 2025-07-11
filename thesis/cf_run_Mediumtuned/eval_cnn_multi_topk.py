@@ -10,7 +10,7 @@ from model_cnn import SimpleCNN
 
 # --- Configuration (MUST MATCH TRAINING) ---
 TARGET_QUERY_LEN = 32
-TARGET_DOC_LEN = 200
+TARGET_DOC_LEN = 220
 PADDING_VALUE = 0.0
 NORMALIZE_MATRICES = False
 # --- End Configuration ---

@@ -2,7 +2,7 @@ import os, json, glob
 from collections import defaultdict
 
 # Config
-COLBERT_EXPERIMENTS_DIR = "./experiments/CF7/thesis.colbert_run.retriever/2025-06/25/17.04.01" 
+COLBERT_EXPERIMENTS_DIR = "./experiments/CF11/thesis.colbert_run.retriever/2025-07/09/02.34.41" 
 #QRELS_PATH = "CF_DataSet/Relevant.txt"
 QRELS_PATH = "./CF_DataSet/Relevant.txt"
 TOPK_VALUES = [5, 10, 20, 25, 40, 50, 80, 100, 150, 180, 200, 250,400,500, 1000]
