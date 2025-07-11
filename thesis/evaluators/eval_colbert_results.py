@@ -2,7 +2,7 @@ import os, json, glob
 from collections import defaultdict
 
 # Config
-COLBERT_EXPERIMENTS_DIR = "./experiments/CF11/thesis.colbert_run.retriever/2025-07/09/02.34.41" 
+COLBERT_EXPERIMENTS_DIR = "./experiments/CF7/thesis.colbert_run.retriever/2025-06/25/17.04.01" 
 #QRELS_PATH = "CF_DataSet/Relevant.txt"
 QRELS_PATH = "./CF_DataSet/Relevant.txt"
 TOPK_VALUES = [5, 10, 20, 25, 40, 50, 80, 100, 150, 180, 200, 250,400,500, 1000]
@@ -12,8 +12,8 @@ TOPK_VALUES = [5, 10, 20, 25, 40, 50, 80, 100, 150, 180, 200, 250,400,500, 1000]
 # TEST_QUERIES = {1,15,20,24,33,34,38,47,53,55,71,72,80,91,93,95}
 # TEST_QUERIES = {1,12,13,18,23,32,36,53,56,82,83,86,95,98,99}
 #TEST_QUERIES = {4,6,7,9,14,20,21,26,28,31,37,40,42,46,51,52,54,55,57,60,63,68,71,74,76,84,87,92,97,99}
-TEST_QUERIES = {1,15,20,24,33,34,38,47,53,55,71,72,80,91,93,95}
-#TEST_QUERIES = {24,37,61,80,87}
+#TEST_QUERIES = {1,15,20,24,33,34,38,47,53,55,71,72,80,91,93,95}
+TEST_QUERIES = {24,37,61,80,87}
 def load_qrels_from_relevant(path, test_only=False):
     """Load qrels from Relevant.txt where line N = query N-1 (0-indexed)"""
     qrels = {}
