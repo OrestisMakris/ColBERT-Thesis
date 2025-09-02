@@ -23,7 +23,7 @@ MODEL_SAVE_PATH       = "cnn_classifier_best_usurum_sm.pt" # Path for the single
 MODEL_SAVE_DIR        = "recent_models_usurum_sm"          # Directory for the last 15 models
 
 TARGET_QUERY_LEN      = 32
-TARGET_DOC_LEN        = 225
+TARGET_DOC_LEN        = 200
 PADDING_VALUE         = 0.0
 
 LR                    = 1e-4
