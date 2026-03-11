@@ -2,7 +2,7 @@ import os, json, glob
 from collections import defaultdict
 
 # Config — update COLBERT_EXPERIMENTS_DIR to match your actual run timestamp
-COLBERT_EXPERIMENTS_DIR = "./experiments/CF19/paper2.colbert_run.retriever"
+COLBERT_EXPERIMENTS_DIR = "./experiments/CF18/paper2.colbert_run.retriever"
 QRELS_PATH = "./CF_DataSet/Relevant.txt"
 TOPK_VALUES = [5, 10, 20, 25, 40, 50, 80, 100, 150, 180, 200, 250, 400, 500, 1000]
 

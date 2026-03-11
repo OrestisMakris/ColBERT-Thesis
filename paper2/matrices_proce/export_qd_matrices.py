@@ -15,10 +15,10 @@ Key improvements over paper/similarity_matrices_proce/export_qd_matrixes.py:
 Usage:
   # IVF-filtered (recommended):
   python paper2/matrices_proce/export_qd_matrices.py \
-      --index ./experiments/CF19/indexes/CF19 \
-      --output_dir ./qd_matrices_CF19_largetuned \
+      --index ./experiments/CF18/indexes/CF18 \
+      --output_dir ./qd_matrices_CF18_mediumtuned \
       --queries ./CF_DataSet/Queries.tsv \
-      --candidates_dir ./ivf_candidates_cf19_largetuned \
+      --candidates_dir ./ivf_candidates_cf18_mediumtuned \
       --save_heatmaps \
       --batch_size 500
 
