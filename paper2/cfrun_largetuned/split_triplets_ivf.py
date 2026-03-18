@@ -14,7 +14,7 @@ from collections import defaultdict
 # ---------------------------------------------------------------------------
 _ROOT = os.path.normpath(os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", ".."))
 
-CANDIDATES_DIR = os.path.join(_ROOT, "ivf_candidates_cf18_mediumtuned")
+CANDIDATES_DIR = os.path.join(_ROOT, "ivf_candidates_cf19_largetuned")
 QRELS_FILE     = os.path.join(_ROOT, "CF_DataSet", "triplets.jsonl")
 
 _OUT_DIR  = os.path.dirname(os.path.abspath(__file__))

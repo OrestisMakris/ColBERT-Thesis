@@ -33,15 +33,15 @@ MATRICES_DIR         = "./qd_matrices_CF17_untuned"  # relative to this script's
 TRAIN_DATA_FILE      = "train_triplets_hard.jsonl"       # relative to this script's dir
 VALIDATION_DATA_FILE = "validation_triplets_hard.jsonl"
 
-MODEL_SAVE_PATH      = "cnn_classifier_arcade.pt"      # best-by-val-acc checkpoint
-MODEL_SAVE_DIR       = "recent_models_arcade"           # rolling last-20 per-epoch saves
+MODEL_SAVE_PATH      = "cnn_classifier_FinalBosss.pt"      # best-by-val-acc checkpoint
+MODEL_SAVE_DIR       = "recent_models_FinalBosss"           # rolling last-20 per-epoch saves
 
 TARGET_QUERY_LEN     = 32
-TARGET_DOC_LEN       = 140
+TARGET_DOC_LEN       = 128 #finall boss 128
 
 LR                   = 1e-4
-EPOCHS               = 90
-BATCH_SIZE           = 2
+EPOCHS               = 40
+BATCH_SIZE           = 4
 NORMALIZE_MATRICES   = False
 # ---------------------------------------------------------------------------
 

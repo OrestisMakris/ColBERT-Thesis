@@ -6,16 +6,14 @@ Baselines:
   2. TF-IDF        — cosine similarity over TF-IDF vectors
   3. BM25 + RM3    — BM25 with pseudo-relevance feedback query expansion
   4. QL (Dirichlet)— Query Likelihood with Dirichlet smoothing (Zhai & Lafferty, 2001)
+    5. BGE-base      — dense bi-encoder retrieval (SentenceTransformers)
+    6. SPLADE        — learned sparse retrieval (masked LM term expansion)
 
 All baselines index the full corpus and rank all documents per query.
 Computes MAP, MRR, P@1, P@5, P@10 at multiple top-k cutoffs.
 
 Usage:
-  python paper2/cfrun_untuned/eval_sparse_baselines.py \
-    --docs_path   CF_DataSet/docs.tsv \
-    --queries_path CF_DataSet/Queries.tsv \
-    --qrels_path  paper2/cfrun_untuned/test_triplets_hard.jsonl \
-    --topk 5,10,15,20,25,50,100,250,500,1000
+python paper2/cfrun_untuned/eval_sparse_baselines.py   --docs_path CF_DataSet/docs.tsv  --queries_path CF_DataSet/Queries.tsv   --qrels_path paper2/cfrun_untuned/test_triplets_hard.jsonl  --baselines bm25,tfidf,bm25rm3,ql,bge,splade   --topk 5,10,15,20,25,40,50,80,100,150,200,250,500,1000 --batch_size 16   --device cuda
 """
 import os
 import json
@@ -260,6 +258,177 @@ def rank_ql_dirichlet(docs, queries, eval_qids, mu=2000):
 
 
 # ---------------------------------------------------------------------------
+# Baseline 5: BGE-base dense retrieval
+# ---------------------------------------------------------------------------
+
+def rank_bge_dense(docs, queries, eval_qids,
+                   model_name="BAAI/bge-base-en-v1.5",
+                   batch_size=64,
+                   device=None):
+    """Rank documents using a dense bi-encoder (BGE family)."""
+    try:
+        from sentence_transformers import SentenceTransformer
+    except ImportError as e:
+        raise ImportError(
+            "BGE baseline requires sentence-transformers. "
+            "Install with: pip install sentence-transformers"
+        ) from e
+
+    pids = sorted(docs.keys())
+    doc_texts = [docs[pid] for pid in pids]
+
+    model = SentenceTransformer(model_name, device=device)
+
+    # BGE works best with this instruction prefix for queries.
+    doc_emb = model.encode(
+        doc_texts,
+        batch_size=batch_size,
+        show_progress_bar=True,
+        normalize_embeddings=True,
+        convert_to_numpy=True,
+    )
+
+    rankings = {}
+    for qid in eval_qids:
+        if qid not in queries:
+            continue
+        q_text = f"Represent this sentence for searching relevant passages: {queries[qid]}"
+        q_emb = model.encode(
+            [q_text],
+            batch_size=1,
+            show_progress_bar=False,
+            normalize_embeddings=True,
+            convert_to_numpy=True,
+        )[0]
+        scores = doc_emb @ q_emb
+        ranked_indices = np.argsort(scores)[::-1]
+        rankings[qid] = [pids[i] for i in ranked_indices]
+    return rankings
+
+
+# ---------------------------------------------------------------------------
+# Baseline 6: SPLADE learned sparse retrieval
+# ---------------------------------------------------------------------------
+
+def _splade_encode_sparse_vectors(texts, tokenizer, model, device,
+                                  batch_size=16, max_length=256, top_terms=128):
+    """Encode texts into sparse term-weight dictionaries using SPLADE pooling."""
+    import torch
+
+    vectors = []
+    for i in range(0, len(texts), batch_size):
+        batch_texts = texts[i:i + batch_size]
+        batch = tokenizer(
+            batch_texts,
+            padding=True,
+            truncation=True,
+            max_length=max_length,
+            return_tensors="pt",
+        )
+        batch = {k: v.to(device) for k, v in batch.items()}
+        with torch.no_grad():
+            logits = model(**batch).logits
+            attn = batch["attention_mask"].unsqueeze(-1)
+            token_weights = torch.log1p(torch.relu(logits)) * attn
+            pooled = torch.max(token_weights, dim=1).values
+
+        for row in pooled:
+            if top_terms and top_terms > 0 and top_terms < row.shape[0]:
+                vals, idxs = torch.topk(row, k=top_terms)
+                sparse = {
+                    int(term_id): float(weight)
+                    for term_id, weight in zip(idxs.tolist(), vals.tolist())
+                    if weight > 0
+                }
+            else:
+                nz = torch.nonzero(row > 0, as_tuple=True)[0]
+                sparse = {int(term_id): float(row[term_id]) for term_id in nz.tolist()}
+            vectors.append(sparse)
+    return vectors
+
+
+def rank_splade(docs, queries, eval_qids,
+                model_name="naver/splade-cocondenser-ensembledistil",
+                batch_size=16,
+                max_length=256,
+                doc_top_terms=128,
+                query_top_terms=64,
+                device=None):
+    """Rank documents with SPLADE sparse vectors and inverted-index scoring."""
+    try:
+        import torch
+        from transformers import AutoTokenizer, AutoModelForMaskedLM
+    except ImportError as e:
+        raise ImportError(
+            "SPLADE baseline requires torch and transformers. "
+            "Install with: pip install torch transformers"
+        ) from e
+
+    if device is None:
+        device = "cuda" if torch.cuda.is_available() else "cpu"
+
+    pids = sorted(docs.keys())
+    doc_texts = [docs[pid] for pid in pids]
+
+    tokenizer = AutoTokenizer.from_pretrained(model_name)
+    model = AutoModelForMaskedLM.from_pretrained(model_name).to(device)
+    model.eval()
+
+    doc_vectors = _splade_encode_sparse_vectors(
+        doc_texts,
+        tokenizer=tokenizer,
+        model=model,
+        device=device,
+        batch_size=batch_size,
+        max_length=max_length,
+        top_terms=doc_top_terms,
+    )
+
+    # Build inverted index: term_id -> list[(doc_index, doc_weight)].
+    postings = defaultdict(list)
+    for doc_idx, sparse_doc in enumerate(doc_vectors):
+        for term_id, weight in sparse_doc.items():
+            postings[term_id].append((doc_idx, weight))
+
+    rankings = {}
+    all_doc_indices = np.arange(len(pids))
+    for qid in eval_qids:
+        if qid not in queries:
+            continue
+
+        q_vec = _splade_encode_sparse_vectors(
+            [queries[qid]],
+            tokenizer=tokenizer,
+            model=model,
+            device=device,
+            batch_size=1,
+            max_length=max_length,
+            top_terms=query_top_terms,
+        )[0]
+
+        scores = defaultdict(float)
+        for term_id, q_weight in q_vec.items():
+            for doc_idx, d_weight in postings.get(term_id, []):
+                scores[doc_idx] += q_weight * d_weight
+
+        if scores:
+            scored_indices = np.array(list(scores.keys()), dtype=np.int64)
+            scored_values = np.array([scores[i] for i in scored_indices], dtype=np.float32)
+            order = np.argsort(scored_values)[::-1]
+            ranked_scored = scored_indices[order]
+
+            scored_set = set(ranked_scored.tolist())
+            remaining = [i for i in all_doc_indices.tolist() if i not in scored_set]
+            final_ranked = ranked_scored.tolist() + remaining
+        else:
+            final_ranked = all_doc_indices.tolist()
+
+        rankings[qid] = [pids[i] for i in final_ranked]
+
+    return rankings
+
+
+# ---------------------------------------------------------------------------
 # Main
 # ---------------------------------------------------------------------------
 
@@ -271,7 +440,21 @@ def main():
     parser.add_argument("--topk",         type=str, default="5,10,15,20,25,50,100,250,500,1000",
                         help="Comma-separated K values")
     parser.add_argument("--baselines",    type=str, default="bm25,tfidf,bm25rm3,ql",
-                        help="Comma-separated baselines to run (bm25,tfidf,bm25rm3,ql)")
+                        help="Comma-separated baselines to run (bm25,tfidf,bm25rm3,ql,bge,splade)")
+    parser.add_argument("--bge_model",    type=str, default="BAAI/bge-base-en-v1.5",
+                        help="SentenceTransformers model id for BGE baseline")
+    parser.add_argument("--splade_model", type=str, default="naver/splade-cocondenser-ensembledistil",
+                        help="Hugging Face model id for SPLADE baseline")
+    parser.add_argument("--batch_size",   type=int, default=16,
+                        help="Encoding batch size for neural baselines")
+    parser.add_argument("--max_length",   type=int, default=256,
+                        help="Max token length for SPLADE encoding")
+    parser.add_argument("--splade_doc_top_terms", type=int, default=128,
+                        help="Keep top-N weighted terms per doc vector")
+    parser.add_argument("--splade_query_top_terms", type=int, default=64,
+                        help="Keep top-N weighted terms per query vector")
+    parser.add_argument("--device", type=str, default=None,
+                        help="Device for neural baselines (e.g., cpu, cuda). Auto if not set")
     args = parser.parse_args()
 
     topk_values = sorted(set(int(k) for k in args.topk.split(",")))
@@ -307,6 +490,35 @@ def main():
         ql_rankings = rank_ql_dirichlet(docs, queries, eval_qids)
         evaluate_rankings(ql_rankings, qrels, eval_qids, topk_values,
                           "Baseline: QL Dirichlet (mu=2000)")
+
+    if "bge" in baselines:
+        print("\nComputing BGE-base dense rankings …")
+        bge_rankings = rank_bge_dense(
+            docs,
+            queries,
+            eval_qids,
+            model_name=args.bge_model,
+            batch_size=args.batch_size,
+            device=args.device,
+        )
+        evaluate_rankings(bge_rankings, qrels, eval_qids, topk_values,
+                          f"Baseline: BGE dense ({args.bge_model})")
+
+    if "splade" in baselines:
+        print("\nComputing SPLADE learned-sparse rankings …")
+        splade_rankings = rank_splade(
+            docs,
+            queries,
+            eval_qids,
+            model_name=args.splade_model,
+            batch_size=args.batch_size,
+            max_length=args.max_length,
+            doc_top_terms=args.splade_doc_top_terms,
+            query_top_terms=args.splade_query_top_terms,
+            device=args.device,
+        )
+        evaluate_rankings(splade_rankings, qrels, eval_qids, topk_values,
+                          f"Baseline: SPLADE ({args.splade_model})")
 
 
 if __name__ == "__main__":

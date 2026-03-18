@@ -2,7 +2,7 @@ import os, json, glob
 from collections import defaultdict
 
 # Config — update COLBERT_EXPERIMENTS_DIR to match your actual run timestamp
-COLBERT_EXPERIMENTS_DIR = "./experiments/CF18/paper2.colbert_run.retriever"
+COLBERT_EXPERIMENTS_DIR = "./experiments/CF19/paper2.colbert_run.retriever"
 QRELS_PATH = "./CF_DataSet/Relevant.txt"
 TOPK_VALUES = [5, 10, 20, 25, 40, 50, 80, 100, 150, 180, 200, 250, 400, 500, 1000]
 
@@ -12,7 +12,7 @@ TOPK_VALUES = [5, 10, 20, 25, 40, 50, 80, 100, 150, 180, 200, 250, 400, 500, 100
 
 TEST_QUERIES = {3,4,11,13,14,17,28,31,35,54,69,75,81,86,94}
 
-# TEST_QUERIES = {86}
+TEST_QUERIES = {94}
 
 def load_qrels_from_relevant(path, test_only=False):
     """Load qrels from Relevant.txt where line N = query N (0-indexed)."""

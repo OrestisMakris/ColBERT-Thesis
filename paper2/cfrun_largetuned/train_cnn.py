@@ -29,7 +29,7 @@ def print_message(msg):
 # ---------------------------------------------------------------------------
 # Configuration
 # ---------------------------------------------------------------------------
-MATRICES_DIR         = "./qd_matrices_CF18_mediumtuned"  # relative to this script's dir
+MATRICES_DIR         = "./qd_matrices_CF19_largetuned"  # relative to this script's dir
 TRAIN_DATA_FILE      = "train_triplets_hard.jsonl"       # relative to this script's dir
 VALIDATION_DATA_FILE = "validation_triplets_hard.jsonl"
 
@@ -42,7 +42,8 @@ TARGET_DOC_LEN       = 128
 
 
 LR                   = 1e-4
-EPOCHS               = 80
+EPOCHS               = 50
+
 BATCH_SIZE           = 4
 NORMALIZE_MATRICES   = False
 # ---------------------------------------------------------------------------
